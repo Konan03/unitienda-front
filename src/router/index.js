@@ -9,10 +9,16 @@
 import { createRouter, createWebHistory } from 'vue-router/auto'
 import { routes } from 'vue-router/auto-routes'
 import Home from '@/pages/Home.vue';
+import MapUnibague from '@/components/navbar/map/Map.vue'
+import Login from '@/components/user/login/Login.vue'
+import Register from '@/components/user/register/Register.vue'
 
 
 const routesPages = [
-  {path: '/', component: Home, name: 'Home'}
+  {path: '/', component: Home, name: 'Home'},
+  {path: '/map', component: MapUnibague, name: 'Map'},
+  {path: '/login', component: Login, name: 'Login'},
+  {path: '/register', component: Register, name: 'Register'}
   
 ]
 

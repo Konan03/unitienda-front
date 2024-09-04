@@ -27,7 +27,7 @@
         <!-- Login -->
         <v-col cols="auto" class="d-flex align-center">
           <v-icon color="yellow" icon="mdi-account"></v-icon>
-          <v-btn class="ml-2 mr-4"> Iniciar sesión / Registrar </v-btn>
+          <v-btn class="ml-2 mr-4" @click="goToLogin"> Iniciar sesión / Registrar </v-btn>
           <v-btn icon class="mr-4" @click="goToCart">
             <v-icon color="yellow" icon="mdi-cart"></v-icon>
           </v-btn>
@@ -43,9 +43,9 @@
           variant="text"
           @click.stop="drawer = !drawer"
         ></v-app-bar-nav-icon>
-        <v-btn class="no-margin" color="white">Inicio</v-btn>
-        <v-btn class="no-margin" color="white">Unibagué</v-btn>
-        <v-btn class="no-margin" color="white">Mapa</v-btn>
+        <v-btn class="no-margin" color="white" @click="goToHome">Inicio</v-btn>
+        <v-btn class="no-margin" color="white" @click="goToUnibague">Unibagué</v-btn>
+        <v-btn class="no-margin" color="white" @click="goToMap">Mapa</v-btn>
       </v-row>
     </v-app-bar>
   </v-container>
@@ -53,14 +53,35 @@
 
 <script setup>
 import { ref } from "vue";
+import { useRouter } from 'vue-router';  // Asegúrate de tener esta importación
+
+const router = useRouter()
 
 const search = ref("");
 
-// Función que se ejecuta al hacer clic en el ícono del carrito
+const goToLogin = () => {
+  router.push({name: 'Login'})
+}
+
 const goToCart = () => {
-  // Aquí puedes agregar la lógica para redirigir al carrito o realizar cualquier acción
   console.log("Ir al carrito");
 };
+
+const goToMap = () => {
+  router.push({name: 'Map'});
+}
+
+const goToHome = () => {
+  router.push({name: 'Home'})
+}
+
+function goToUnibague() {
+  window.open('https://www.unibague.edu.co/', '_blank');
+}
+
+
+
+
 </script>
 
 <style scoped>

@@ -20,7 +20,7 @@
     <CardProduct/>
     <Welcome/>
     <BenefitsBar/>
-    <Footer/>
+    <!-- <Footer/> -->
 
   </v-container>
 </template>
