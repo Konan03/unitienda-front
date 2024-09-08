@@ -26,10 +26,10 @@
 
         <!-- Login -->
         <v-col cols="auto" class="d-flex align-center">
-          <v-icon color="yellow" icon="mdi-account"></v-icon>
+          <v-icon color="#FAB400" icon="mdi-account"></v-icon>
           <v-btn class="ml-2 mr-4" @click="goToLogin"> Iniciar sesión / Registrar </v-btn>
           <v-btn icon class="mr-4" @click="goToCart">
-            <v-icon color="yellow" icon="mdi-cart"></v-icon>
+            <v-icon color="#FAB400" icon="mdi-cart"></v-icon>
           </v-btn>
         </v-col>
       </v-row>

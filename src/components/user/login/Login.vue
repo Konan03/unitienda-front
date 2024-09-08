@@ -85,6 +85,7 @@ function goToCreateAccount() {
 function goToForgotPassword() {
   // Lógica para redirigir a la página de recuperación de contraseña
   console.log("Redirigiendo a recuperación de contraseña...");
+  router.push({name: 'ChangePassword'})
 }
 
 function login() {
