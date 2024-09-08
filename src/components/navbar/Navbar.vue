@@ -48,6 +48,44 @@
         <v-btn class="no-margin" color="white" @click="goToMap">Mapa</v-btn>
       </v-row>
     </v-app-bar>
+
+    <!-- Menú lateral (Drawer) -->
+    <v-navigation-drawer v-model="drawer" app temporary>
+      <v-list dense>
+        <v-list-item>
+          <v-list-item-content>
+            <v-list-item-title class="text-h6" style="color:#264983 ;">Categorías</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+
+        <v-divider></v-divider>
+
+        <v-list-item link>
+          <v-list-item-content>
+            <v-list-item-title>Libros</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+
+        <v-list-item link>
+          <v-list-item-content>
+            <v-list-item-title>Termos</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+
+        <v-list-item link>
+          <v-list-item-content>
+            <v-list-item-title>Papelería</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+
+        <v-list-item link>
+          <v-list-item-content>
+            <v-list-item-title>Ropa</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+      </v-list>
+    </v-navigation-drawer>
+  
   </v-container>
 </template>
 
@@ -56,7 +94,7 @@ import { ref } from "vue";
 import { useRouter } from 'vue-router';  // Asegúrate de tener esta importación
 
 const router = useRouter()
-
+const drawer = ref(false);
 const search = ref("");
 
 const goToLogin = () => {

@@ -1,7 +1,7 @@
 <template>
   <v-container
     class="d-flex flex-column align-center justify-center"
-    style="height: 75vh"
+    
   >
     <v-card class="pa-4" max-width="400" flat>
       <!-- Encabezado de Bienvenida -->
