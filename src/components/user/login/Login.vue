@@ -91,6 +91,7 @@ function goToForgotPassword() {
 function login() {
   // Lógica para iniciar sesión
   console.log("Iniciando sesión con", email.value, password.value);
+  router.push({name: 'UserDetails'})
 }
 
 function loginWithGoogle() {

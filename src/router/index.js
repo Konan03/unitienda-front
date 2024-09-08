@@ -15,6 +15,7 @@ import Register from '@/pages/userPages/RegisterPage.vue'
 import ChangePassword from '@/pages/passwordPages/ChangePasswordPage.vue';
 import VerifyCode from '@/pages/passwordPages/VerifyCodePage.vue';
 import NewPassword from '@/pages/passwordPages/NewPasswordPage.vue';
+import UserDetails from '@/pages/userPages/userDetails/UserDatailsPage.vue'
 
 
 const routesPages = [
@@ -24,7 +25,8 @@ const routesPages = [
   {path: '/register', component: Register, name: 'Register'},
   {path: '/changePassword', component: ChangePassword, name: 'ChangePassword'},
   {path: '/changePassword/verifyCode', component: VerifyCode, name: 'VerifyCode'},
-  {path: '/changePassword/verifyCode/newPassword', component: NewPassword, name: 'NewPassword'}
+  {path: '/changePassword/verifyCode/newPassword', component: NewPassword, name: 'NewPassword'},
+  {path: '/details', component: UserDetails, name: 'UserDetails' }
 ]
 
 const router = createRouter({
