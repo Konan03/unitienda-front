@@ -43,13 +43,13 @@
 
   .data{
     font-size: 25px;
-    margin-bottom: 108px;
+    margin-bottom: 108.5px;
   }
 
   .text-profile{
     font-size: 60px;
     color: #FAB400;
-    margin-bottom: 20px;
+    margin-bottom: 19px;
     margin-left: 70px
   }
 

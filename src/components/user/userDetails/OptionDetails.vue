@@ -29,7 +29,7 @@
           </v-list-item-content>
         </v-list-item>
 
-        <v-list-item class="list-item">
+        <v-list-item class="list-item" @click="changeTo('PaymentView')">
           <v-list-item-content>
             <v-list-item-title>Métodos de pago</v-list-item-title>
           </v-list-item-content>

@@ -20,6 +20,7 @@ import { ref } from "vue";
 import OptionDetails from "@/components/user/userDetails/OptionDetails.vue";
 import ProfileView from "@/components/user/userDetails/profileView/ProfileView.vue";
 import AddressView from "@/components/user/userDetails/addressView/AddressView.vue";
+import PaymentView from "@/components/user/userDetails/paymentMethod/PaymentView.vue";
 
 const currentView = ref(ProfileView);
 // Función para cambiar la vista
@@ -28,6 +29,8 @@ const changeView = (view) => {
     currentView.value = ProfileView;
   } else if (view === 'AddressView') {
     currentView.value = AddressView;
+  } else if(view === 'PaymentView'){
+    currentView.value = PaymentView;
   }
 };
 </script>
