@@ -23,7 +23,7 @@
           </v-list-item-content>
         </v-list-item>
 
-        <v-list-item class="list-item">
+        <v-list-item class="list-item" @click="changeTo('OrderView')">
           <v-list-item-content>
             <v-list-item-title>Pedidos</v-list-item-title>
           </v-list-item-content>

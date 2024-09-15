@@ -16,13 +16,14 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, shallowRef } from "vue";
 import OptionDetails from "@/components/user/userDetails/OptionDetails.vue";
 import ProfileView from "@/components/user/userDetails/profileView/ProfileView.vue";
 import AddressView from "@/components/user/userDetails/addressView/AddressView.vue";
 import PaymentView from "@/components/user/userDetails/paymentMethod/PaymentView.vue";
+import OrderView from "@/components/user/userDetails/orders/OrderView.vue";
 
-const currentView = ref(ProfileView);
+const currentView = shallowRef(ProfileView);
 // Función para cambiar la vista
 const changeView = (view) => {
   if (view === 'ProfileView') {
@@ -31,6 +32,8 @@ const changeView = (view) => {
     currentView.value = AddressView;
   } else if(view === 'PaymentView'){
     currentView.value = PaymentView;
+  } else if(view === 'OrderView'){
+    currentView.value = OrderView;
   }
 };
 </script>

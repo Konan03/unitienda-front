@@ -19,6 +19,8 @@ import vuetify from './plugins/vuetify'
 //router
 import router from './router';
 
+
+
 const app = createApp(App)
 
 registerPlugins(app)
