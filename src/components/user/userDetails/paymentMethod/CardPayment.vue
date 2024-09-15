@@ -4,9 +4,10 @@
       <!-- Icono de la tarjeta (logotipo de Visa) -->
       <v-col cols="auto">
         <v-img
-        src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Visa_Inc._logo.svg/1200px-Visa_Inc._logo.svg.png"
+        src="/src/assets/visa.png"
           alt="Visa logo"
           max-width="50"
+          max-height="30"
         ></v-img>
       </v-col>
 
