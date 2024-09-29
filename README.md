@@ -4,7 +4,7 @@
 
 ## Descripción del Proyecto
 
-Este proyecto es una tienda en línea desarrollada para la Tienda Universitaria, que ofrece productos como libros, termos, papelería y ropa. La plataforma permite a los usuarios navegar por categorías, agregar productos al carrito y realizar compras de forma rápida y eficiente.
+Este proyecto es una tienda en línea desarrollada para estudiante de la Universidad de Ibague como su proyecto de grado, que ofrece productos como libros, termos, papelería y ropa. La plataforma permite a los usuarios navegar por categorías, agregar productos al carrito y realizar compras de forma rápida y eficiente.
 
 ## Estado del proyecto
 
