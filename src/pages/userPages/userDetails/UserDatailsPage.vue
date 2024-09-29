@@ -1,4 +1,4 @@
-<template>
+<template  class="d-flex flex-column align-center justify-center">
   <v-container fluid>
     <v-row>
       <!-- Columna izquierda para el componente OptionDetails -->
