@@ -17,7 +17,10 @@ import VerifyCode from '@/pages/passwordPages/VerifyCodePage.vue';
 import NewPassword from '@/pages/passwordPages/NewPasswordPage.vue';
 import UserDetails from '@/pages/userPages/userDetails/UserDatailsPage.vue'
 import Cart from '@/pages/cartPage/CartPage.vue'
-
+import Books from '@/pages/categoryPages/BooksPage.vue'
+import Thermos from '@/pages/categoryPages/ThermosPage.vue'
+import Stationery from '@/pages/categoryPages/StationeryPage.vue'
+import Clothes from '@/pages/categoryPages/ClothesPage.vue'
 
 const routesPages = [
   {path: '/', component: Home, name: 'Home'},
@@ -28,7 +31,11 @@ const routesPages = [
   {path: '/changePassword/verifyCode', component: VerifyCode, name: 'VerifyCode'},
   {path: '/changePassword/verifyCode/newPassword', component: NewPassword, name: 'NewPassword'},
   {path: '/details', component: UserDetails, name: 'UserDetails' },
-  {path: '/cart', component: Cart, name: 'Cart'}
+  {path: '/cart', component: Cart, name: 'Cart'},
+  {path: '/books', component: Books, name: 'Books'},
+  {path: '/thermos', component: Thermos, name: 'Thermos'},
+  {path: '/stationery', component: Stationery, name: 'Stationery'},
+  {path: '/clothes', component: Clothes, name: 'Clothes'}
 ]
 
 const router = createRouter({

@@ -117,25 +117,25 @@
 
         <v-divider></v-divider>
 
-        <v-list-item link>
+        <v-list-item link @click="goToPageBooks">
           <v-list-item-content>
             <v-list-item-title>Libros</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
 
-        <v-list-item link>
+        <v-list-item link @click="goToPageThermos">
           <v-list-item-content>
             <v-list-item-title>Termos</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
 
-        <v-list-item link>
+        <v-list-item link @click="goToPageStationery">
           <v-list-item-content>
             <v-list-item-title>Papelería</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
 
-        <v-list-item link>
+        <v-list-item link @click="goToPageClothes">
           <v-list-item-content>
             <v-list-item-title>Ropa</v-list-item-title>
           </v-list-item-content>
@@ -212,10 +212,12 @@ const cartProducts = ref([
   // Puedes agregar más productos aquí
 ]);
 
+//remueve el prpducto del carrito
 const removeFromCart = (index) => {
   cartProducts.value.splice(index, 1);
 };
 
+//redireccion al login, cart, mapa y home
 const goToLogin = () => {
   router.push({ name: "Login" });
 };
@@ -235,6 +237,23 @@ const goToHome = () => {
 
 function goToUnibague() {
   window.open("https://www.unibague.edu.co/", "_blank");
+}
+
+//redireccion en categorias
+const goToPageBooks = () => {
+  router.push({ name: "Books" });
+}
+
+const goToPageThermos = () => {
+  router.push({ name: "Thermos" });
+}
+
+const goToPageStationery = () => {
+  router.push({ name: "Stationery" });
+}
+
+const goToPageClothes = () => {
+  router.push({ name: "Clothes" });
 }
 
 // Función para abrir el modal
