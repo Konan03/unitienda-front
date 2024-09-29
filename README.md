@@ -1,6 +1,6 @@
 # Tienda Universitaria
 
-![Imagen de Portada](ruta-de-imagen.png)
+![Imagen de Portada](src\assets\page.png)
 
 ## Descripción del Proyecto
 
