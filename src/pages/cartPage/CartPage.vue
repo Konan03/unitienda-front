@@ -1,11 +1,9 @@
 <template >
   <v-container class="d-flex flex-column align-center justify-center"> 
     <v-row>
+      
       <v-col>
-        <div></div>
-      </v-col>
-      <v-col>
-        <div class="d-flex justify-center">
+        <div class="d-flex justify-center text-micarrito">
           <h2 style="color: #0f1f39">Mi carrito</h2>
         </div>
       </v-col>
@@ -76,5 +74,8 @@ const cartProducts = [
 h2 {
   font-size: 2rem;
   font-weight: bold;
+}
+.text-micarrito{
+  margin-right: -890px;
 }
 </style>

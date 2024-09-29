@@ -1,23 +1,31 @@
 <template>
-  <v-container class="image-container">
+  <!-- Eliminamos el v-container para que no limite el tamaño -->
+  <div class="banner-wrapper">
+    <!-- Imagen ajustada para ocupar todo el ancho y altura -->
     <img
       src="/src/assets/img/carrusel ejemplo 1.png"
-      class="full-width-image"
+      class="banner-img"
     />
+  </div>
 
-    
-    <Products/>
-     <!-- Cuadrícula de productos -->
-     <v-row>
-      <v-col cols="12" md="3" v-for="n in 4" :key="n">
-        <CardProduct />
-      </v-col>
-    </v-row>
-    <Welcome/>
-    <BenefitsBar/>
-    <!-- <Footer/> -->
+  <!-- Productos destacados -->
+  <Products/>
 
-  </v-container>
+  <!-- Cuadrícula de productos -->
+  <v-row>
+    <v-col cols="12" md="3" v-for="n in 4" :key="n">
+      <CardProduct />
+    </v-col>
+  </v-row>
+
+  <!-- Sección de bienvenida -->
+  <Welcome/>
+
+  <!-- Barra de beneficios -->
+  <BenefitsBar/>
+
+  <!-- <Footer/> -->
+   
 </template>
 
 <script setup>
@@ -31,18 +39,18 @@ import Welcome from '@/components/home/welcomeSection/Welcome.vue';
 </script>
 
 <style scoped>
-.image-container {
+/* Ajustamos la imagen para que ocupe todo el espacio disponible */
+.banner-wrapper {
   width: 100%;
-  padding: 0 !important;
+  height: 60vh;
+  overflow: hidden;
+  margin-top: -32px;
 }
 
-.full-width-image {
-  width: 100%; /* Ocupa todo el ancho de la ventana */
-  height: 100vh; /* Ocupa todo el alto de la ventana */
-  object-fit: cover; /* Ajusta la imagen para que cubra todo el espacio sin distorsión */
-  display: block;
-  margin: 0;
-  padding: 0;
+.banner-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center; /* Centra la imagen para que se vea bien */
 }
-
 </style>
