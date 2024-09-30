@@ -54,16 +54,16 @@ Puedes acceder al proyecto clonando este repositorio y siguiendo las instruccion
    Una vez iniciado el servidor, puedes acceder a la aplicación en 🌍 http://localhost:8080 (localmente).
 
 ## 🛠️ Tecnologias usadas
-🖼️ Vue.js
-🎨 Vuetify 3
-🟢 Node.js
-📦 NPM
+- ![Vue.js](https://img.shields.io/badge/-Vue.js-4FC08D?logo=vue.js&logoColor=white&style=flat) 
+- ![Vuetify 3](https://img.shields.io/badge/-Vuetify%203-1867C0?logo=vuetify&logoColor=white&style=flat)
+- ![Node.js](https://img.shields.io/badge/-Node.js-339933?logo=node.js&logoColor=white&style=flat)
+- ![NPM](https://img.shields.io/badge/-NPM-CB3837?logo=npm&logoColor=white&style=flat)
 
 ## 👥 Personas Contribuyentes
 Este proyecto está siendo desarrollado actualmente por una sola persona.
 
 ## 💻 Personas Desarrolladoras del Proyecto
-Manuel Caicedo:
-🧩 GitHub: https://github.com/Konan03
-📧 Email: manuelcaicedo52@gmail.com
-⏺️ Linkedin: https://www.linkedin.com/in/jose-manuel-caicedo-perdomo/
+- **Manuel Caicedo**  
+  - ![GitHub](https://img.shields.io/badge/-GitHub-181717?logo=github&logoColor=white&style=flat): [https://github.com/Konan03](https://github.com/Konan03)
+  - ![Email](https://img.shields.io/badge/-Email-D14836?logo=gmail&logoColor=white&style=flat): manuelcaicedo52@gmail.com
+  - ![LinkedIn](https://img.shields.io/badge/-LinkedIn-0A66C2?logo=linkedin&logoColor=white&style=flat): [https://www.linkedin.com/in/jose-manuel-caicedo-perdomo/](https://www.linkedin.com/in/jose-manuel-caicedo-perdomo/)
