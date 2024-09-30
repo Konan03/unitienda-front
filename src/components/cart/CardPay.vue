@@ -18,8 +18,8 @@
         <v-btn outlined class="mb-2 d-flex justify-space-between " style="width: 100%; min-width: 300px;">
           <span >Tarjeta de débito</span>
           <div class="d-flex">
-            <v-img src="https://upload.wikimedia.org/wikipedia/commons/0/04/Visa.svg" width="30" height="20" class="mr-2"></v-img>
-            <v-img src="https://upload.wikimedia.org/wikipedia/commons/a/a4/Mastercard_2019_logo.svg" width="30" height="20"></v-img>
+            <v-img src="/src/assets/img/Visa.svg" width="30" height="20" class="mr-2"></v-img>
+            <v-img src="/src/assets/img/Mastercard.svg" width="30" height="20"></v-img>
           </div>
         </v-btn>
 
@@ -27,8 +27,8 @@
         <v-btn outlined class="mb-2 d-flex justify-space-between" style="width: 100%; min-width: 300px;">
           <span>Tarjeta de crédito</span>
           <div class="d-flex">
-            <v-img src="https://upload.wikimedia.org/wikipedia/commons/0/04/Visa.svg" width="30" height="20" class="mr-2"></v-img>
-            <v-img src="https://upload.wikimedia.org/wikipedia/commons/a/a4/Mastercard_2019_logo.svg" width="30" height="20"></v-img>
+            <v-img src="/src/assets/img/Visa.svg" width="30" height="20" class="mr-2"></v-img>
+            <v-img src="/src/assets/img/Mastercard.svg" width="30" height="20"></v-img>
           </div>
         </v-btn>
 
@@ -49,7 +49,7 @@
       <v-col cols="6">
         <v-btn outlined class="mb-2 d-flex justify-space-between" style="width: 100%; min-width: 300px;">
           <div class="d-flex align-center">
-            <v-img src="https://upload.wikimedia.org/wikipedia/commons/0/04/Visa.svg" width="30" height="20" class="mr-2"></v-img>
+            <v-img src="/src/assets/img/Mastercard.svg" width="30" height="20" class="mr-2"></v-img>
             <div>
               <div>Visa ****5678</div>
               <div>06/2026</div>

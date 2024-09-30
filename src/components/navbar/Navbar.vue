@@ -53,7 +53,7 @@
       </v-row>
     </v-app-bar>
 
-    <!-- Modal para el formulario de edición -->
+    <!-- Modal para el cart-->
     <v-dialog v-model="isDialogOpen" max-width="600px">
       <v-card rounded="xl">
         <v-card-title class="headline text-center" color="#264983">Carrito</v-card-title>
@@ -64,7 +64,8 @@
               max-height: 300px;
               overflow-y: auto;
               overflow-x: hidden;
-              padding-right: 10px;
+              border: 1px solid #797575;
+              padding: 10px;
             "
           >
             <v-row>
