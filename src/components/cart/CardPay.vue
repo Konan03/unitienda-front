@@ -15,8 +15,13 @@
       <!-- Opciones de pago (Izquierda) -->
       <v-col cols="6">
         <!-- Botón de Tarjeta de débito -->
-        <v-btn outlined class="mb-2 d-flex justify-space-between " style="width: 100%; min-width: 300px;">
-          <span >Tarjeta de débito</span>
+        <v-btn 
+          :class="selectedPayment === 'debito' ? 'selected-payment' : ''"
+          outlined class="mb-2 d-flex justify-space-between" 
+          style="width: 100%; min-width: 300px;"
+          @click="selectPayment('debito')"
+        >
+          <span>Tarjeta de débito</span>
           <div class="d-flex">
             <v-img src="/src/assets/img/Visa.svg" width="30" height="20" class="mr-2"></v-img>
             <v-img src="/src/assets/img/Mastercard.svg" width="30" height="20"></v-img>
@@ -24,7 +29,12 @@
         </v-btn>
 
         <!-- Botón de Tarjeta de crédito -->
-        <v-btn outlined class="mb-2 d-flex justify-space-between" style="width: 100%; min-width: 300px;">
+        <v-btn 
+          :class="selectedPayment === 'credito' ? 'selected-payment' : ''"
+          outlined class="mb-2 d-flex justify-space-between" 
+          style="width: 100%; min-width: 300px;"
+          @click="selectPayment('credito')"
+        >
           <span>Tarjeta de crédito</span>
           <div class="d-flex">
             <v-img src="/src/assets/img/Visa.svg" width="30" height="20" class="mr-2"></v-img>
@@ -33,13 +43,23 @@
         </v-btn>
 
         <!-- Botón PSE -->
-        <v-btn outlined class="mb-2 d-flex justify-space-between" style="width: 100%; min-width: 300px;">
+        <v-btn 
+          :class="selectedPayment === 'pse' ? 'selected-payment' : ''"
+          outlined class="mb-2 d-flex justify-space-between" 
+          style="width: 100%; min-width: 300px;"
+          @click="selectPayment('pse')"
+        >
           <span>PSE</span>
           <v-img src="/src/assets/img/pse.png" width="30" height="30"></v-img>
         </v-btn>
 
         <!-- Botón Gana Gana -->
-        <v-btn outlined class="d-flex justify-space-between" style="width: 100%; min-width: 300px;">
+        <v-btn 
+          :class="selectedPayment === 'ganagana' ? 'selected-payment' : ''"
+          outlined class="d-flex justify-space-between" 
+          style="width: 100%; min-width: 300px;"
+          @click="selectPayment('ganagana')"
+        >
           <span>Gana Gana</span>
           <v-img src="/src/assets/img/ganagana.png" width="30" height="30"></v-img>
         </v-btn>
@@ -47,7 +67,12 @@
 
       <!-- Detalles de la tarjeta seleccionada (Derecha) -->
       <v-col cols="6">
-        <v-btn outlined class="mb-2 d-flex justify-space-between" style="width: 100%; min-width: 300px;">
+        <v-btn 
+          :class="selectedPayment === 'visa' ? 'selected-payment' : ''"
+          outlined class="mb-2 d-flex justify-space-between" 
+          style="width: 100%; min-width: 300px;"
+          @click="selectPayment('visa')"
+        >
           <div class="d-flex align-center">
             <v-img src="/src/assets/img/Mastercard.svg" width="30" height="20" class="mr-2"></v-img>
             <div>
@@ -55,7 +80,6 @@
               <div>06/2026</div>
             </div>
           </div>
-          <v-radio v-model="selectedPayment" value="visa"></v-radio>
         </v-btn>
 
         <!-- Botón Agregar tarjeta -->
@@ -125,7 +149,10 @@ const months = Array.from({ length: 12 }, (_, i) => (i + 1).toString().padStart(
 const currentYear = new Date().getFullYear();
 const years = Array.from({ length: 61 }, (_, i) => (currentYear - 30 + i).toString()); // Años desde el pasado
 
-
+// Función para seleccionar un método de pago
+const selectPayment = (payment) => {
+  selectedPayment.value = payment;
+};
 
 // Función para abrir el modal
 const openAddDialog = () => {
@@ -140,12 +167,19 @@ const savePaymentMethod = () => {
 };
 </script>
 
-<style>
-.border-btn{
+<style scoped>
+.border-btn {
   border: 1px solid #797575;
-  }
-  .headline {
+}
+
+.headline {
   color: #fab400;
 }
-  
+
+/* Clase para el botón seleccionado */
+.selected-payment {
+  background-color: #0F1F39 !important;
+  border-color: #fab400 !important;
+  color: white !important;
+}
 </style>

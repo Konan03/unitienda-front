@@ -16,9 +16,9 @@
           <ul class="footer-list">
             <li>Novedades</li>
             <li>Destacados</li>
-            <li>Libros</li>
-            <li>Termos</li>
-            <li>Papelería</li>
+            <li @click="goToRouteBooks()" class="li-pointer">Libros</li>
+            <li @click="goToRouteThermos()" class="li-pointer">Termos</li>
+            <li @click="goToRouteStationery()" class="li-pointer">Papelería</li>
           </ul>
         </v-col>
 
@@ -38,10 +38,10 @@
         <v-col>
           <h3 class="footer-subtitle">Enlaces de interés</h3>
           <ul class="footer-list">
-            <li>¿Quiénes somos?</li>
-            <li>Preguntas frecuentes</li>
-            <li>Medios de pago</li>
-            <li>Unibague</li>
+            <li class="li-pointer">¿Quiénes somos?</li>
+            <li class="li-pointer">Preguntas frecuentes</li>
+            <li class="li-pointer">Medios de pago</li>
+            <li class="li-pointer">Unibague</li>
             <li>PQRS</li>
           </ul>
         </v-col>
@@ -51,7 +51,27 @@
 </template>
 
 <script setup>
-//
+import { useRouter } from "vue-router";
+
+const router = useRouter();
+
+function goToRouteBooks() {
+  router.push({ name: "Books" }).then(() => {
+    window.scrollTo(0, 0) // Desplaza la página hacia arriba
+  })
+}
+
+function goToRouteThermos() {
+  router.push({ name: "Thermos" }).then(() => {
+    window.scrollTo(0, 0) // Desplaza la página hacia arriba
+  });
+}
+
+function goToRouteStationery() {
+  router.push({ name: "Stationery" }).then(() => {
+    window.scrollTo(0, 0) // Desplaza la página hacia arriba
+  });
+}
 </script>
 
 <style scoped>
@@ -79,8 +99,14 @@
   margin: 0;
 }
 
-.footer-list li {
+.footer-list{
   font-size: 16px;
   margin-bottom: 8px;
+  
+}
+
+.li-pointer{
+  cursor: pointer;
+
 }
 </style>

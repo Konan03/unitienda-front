@@ -21,6 +21,7 @@ import Books from '@/pages/categoryPages/BooksPage.vue'
 import Thermos from '@/pages/categoryPages/ThermosPage.vue'
 import Stationery from '@/pages/categoryPages/StationeryPage.vue'
 import Clothes from '@/pages/categoryPages/ClothesPage.vue'
+import ConfirmPayPage from '@/pages/payPage/ConfirmPayPage.vue';
 
 const routesPages = [
   {path: '/', component: Home, name: 'Home'},
@@ -35,7 +36,8 @@ const routesPages = [
   {path: '/books', component: Books, name: 'Books'},
   {path: '/thermos', component: Thermos, name: 'Thermos'},
   {path: '/stationery', component: Stationery, name: 'Stationery'},
-  {path: '/clothes', component: Clothes, name: 'Clothes'}
+  {path: '/clothes', component: Clothes, name: 'Clothes'},
+  {path: '/messagePay', component: ConfirmPayPage, name: 'ConfirmPayPage'}
 ]
 
 const router = createRouter({

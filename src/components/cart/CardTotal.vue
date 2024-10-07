@@ -38,9 +38,11 @@
   </template>
   
   <script setup>
+  import { useRouter } from "vue-router";
+  const router = useRouter();
   function comprarAhora() {
     // Acción al hacer clic en el botón "Comprar ahora"
-    console.log("Compra realizada");
+    router.push({ name: "ConfirmPayPage" });
   }
   </script>
   

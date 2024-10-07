@@ -18,7 +18,7 @@
       <v-img height="350" src="\src\assets\img\image 3.png" cover></v-img>
 
       <v-card-item>
-        <v-card-title>Termo</v-card-title>
+        <v-card-title>Libro</v-card-title>
         <v-card-title>$ 34.900</v-card-title>
       </v-card-item>
 
@@ -29,16 +29,36 @@
             <span>Colores disponibles:</span>
             <v-row>
               <v-col cols="auto">
-                <v-chip color="red" class="ma-1" small></v-chip>
+                <v-chip
+                  :class="['color-chip', { 'selected-chip': selectedColor === 'red' }]"
+                  small
+                  @click="selectColor('red')"
+                  style="background-color: #FF1744;"  
+                ></v-chip>
               </v-col>
               <v-col cols="auto">
-                <v-chip color="blue" class="ma-1" small></v-chip>
+                <v-chip
+                  :class="['color-chip', { 'selected-chip': selectedColor === 'blue' }]"
+                  small
+                  @click="selectColor('blue')"
+                  style="background-color: #2979FF;"  
+                ></v-chip>
               </v-col>
               <v-col cols="auto">
-                <v-chip color="green" class="ma-1" small></v-chip>
+                <v-chip
+                  :class="['color-chip', { 'selected-chip': selectedColor === 'green' }]"
+                  small
+                  @click="selectColor('green')"
+                  style="background-color: #00E676;"  
+                ></v-chip>
               </v-col>
               <v-col cols="auto">
-                <v-chip color="black" class="ma-1" small></v-chip>
+                <v-chip
+                  :class="['color-chip', { 'selected-chip': selectedColor === 'gray' }]"
+                  small
+                  @click="selectColor('gray')"
+                  style="background-color: #9E9E9E;"  
+                ></v-chip>
               </v-col>
             </v-row>
           </v-col>
@@ -57,7 +77,15 @@
 </template>
 
 <script setup>
-//
+import { ref } from 'vue'
+
+// Variable para almacenar el color seleccionado
+const selectedColor = ref('')
+
+// Función para seleccionar un color
+function selectColor(color) {
+  selectedColor.value = color
+}
 </script>
 
 <style scoped>
@@ -74,4 +102,17 @@
   background-color: #ffca28 !important; /* Color del botón al hacer hover */
 }
 
+/* Estilos para los chips de color */
+.color-chip {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
+}
+
+/* Chip seleccionado: Borde más visible */
+.selected-chip {
+  border: 3px solid #000000; /* Borde dorado para destacar la selección */
+}
 </style>
