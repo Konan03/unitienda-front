@@ -12,7 +12,7 @@
       <!-- Columna izquierda -->
       <v-col cols="12" md="6">
         <!-- Cards a la izquierda -->
-        <CardInfo />
+        <CardInfo class="mb-4"/>
         <CardSend class="mt-4 mb-4" />
         <CardPay  />
       </v-col>
