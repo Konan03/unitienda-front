@@ -13,13 +13,10 @@
         <v-col cols="12" md="6">
           <h1 class="welcome-title">¡Bienvenidos a la tienda universitaria!</h1>
           <p class="welcome-text">
-            "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-            eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad
-            minim veniam, quis nostrud exercitation ullamco laboris nisi ut
-            aliquip ex ea commodo consequat. Duis aute irure dolor in
-            reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
-            pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
-            culpa qui officia deserunt mollit anim id est laborum."
+            Descubre todo lo que necesitas para vivir al máximo la experiencia universitaria. 
+            Desde el material académico hasta el mejor equipo para mostrar tu orgullo estudiantil. 
+            Navega por una selección exclusiva de productos diseñados para acompañarte en cada paso de tu camino universitario.
+            ¡Haz que tu espíritu de estudiante brille con todo lo que tenemos para ofrecer!
           </p>
           <v-btn class="see-more-btn"> Ver más </v-btn>
         </v-col>
@@ -44,6 +41,7 @@
     font-weight: 500;
     color: #2f2f2f; /* Color gris oscuro */
     margin-bottom: 20px;
+    text-align: center;
   }
   
   .see-more-btn {
