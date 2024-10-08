@@ -76,6 +76,9 @@ const email = ref("");
 const password = ref("");
 const router = useRouter()
 
+const emailAdmin = "admin@admin.com"
+const emailUser = "user@user.com"
+
 function goToCreateAccount() {
   // Lógica para redirigir a la página de creación de cuenta
   console.log("Redirigiendo a crear cuenta...");
@@ -90,8 +93,16 @@ function goToForgotPassword() {
 
 function login() {
   // Lógica para iniciar sesión
-  console.log("Iniciando sesión con", email.value, password.value);
-  router.push({name: 'UserDetails'})
+  if(email.value == emailAdmin){
+    console.log("Iniciando sesión con", email.value, password.value);
+    router.push({name: 'AdminDetails'})
+  }
+
+  if(email.value == emailUser){
+    console.log("Iniciando sesión con", email.value, password.value);
+    router.push({name: 'UserDetails'})
+  }
+  
 }
 
 function loginWithGoogle() {

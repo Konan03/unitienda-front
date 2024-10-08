@@ -15,7 +15,9 @@
             <strong>#1289238239</strong>
           </v-col>
           <v-col cols="12">
-            <v-chip color="#6FF14B" class="ml-2 custom-chip"><span class="chip-text">Enviando pedido</span></v-chip>
+            <v-chip color="#6FF14B" class="ml-2 custom-chip"
+              ><span class="chip-text">Enviando pedido</span></v-chip
+            >
           </v-col>
         </v-row>
       </v-col>
@@ -39,14 +41,18 @@
       </v-col>
       <v-col cols="12" md="4" class="text-right">
         <v-btn color="#486594" class="mb-2 border-btn">Pedir de nuevo</v-btn>
-        <v-btn color="#FAB400" outlined class="white-text-btn" @click="openDialog"
+        <v-btn
+          color="#FAB400"
+          outlined
+          class="white-text-btn"
+          @click="openDialog"
           >ver detalles del pedido</v-btn
         >
       </v-col>
     </v-row>
   </v-card>
 
-  <!-- Modal -->
+  <!-- Modal detalles de pedido -->
   <v-dialog v-model="isDialogOpen" max-width="1000px">
     <v-card rounded="xl">
       <v-card-title>
@@ -67,7 +73,14 @@
           </v-col>
         </v-row>
         <CardStateInfo />
-        <CardOrdeInfo />
+        <!-- Sección con scroll -->
+        <v-row>
+          <v-col cols="12">
+            <div class="scroll-container">
+              <CardOrdeInfo class="ml-4" v-for="i in 6" :key="i" />
+            </div>
+          </v-col>
+        </v-row>
       </v-card-text>
 
       <v-card-actions>
@@ -119,7 +132,7 @@ const closeCard = () => {
   margin-left: -180px;
 }
 
-.border-btn{
+.border-btn {
   border-radius: 10px;
 }
 
@@ -130,11 +143,26 @@ const closeCard = () => {
 }
 
 .custom-chip {
-  background-color: #6FF14B !important; /* Color de fondo más fuerte */  
+  background-color: #6ff14b !important; /* Color de fondo más fuerte */
   border-radius: 10px;
 }
 .chip-text {
   color: white !important; /* Asegura que el texto sea blanco */
   font-weight: bold; /* Hace el texto más visible */
+}
+
+.scroll-container {
+  max-height: 300px;
+  overflow-y: auto;
+  padding-right: 16px; /* Espacio para la barra de scroll */
+}
+
+/* Estilo para el contenedor de scroll */
+.scroll-container {
+  max-height: 300px; /* Ajusta la altura del área de scroll */
+  overflow-y: auto;
+  padding-right: 16px; /* Espacio para la barra de scroll */
+  border: 2px solid #979797; /* Agrega un borde */
+  border-radius: 4px;
 }
 </style>

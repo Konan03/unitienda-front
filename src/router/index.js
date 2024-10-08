@@ -15,13 +15,14 @@ import Register from '@/pages/userPages/RegisterPage.vue'
 import ChangePassword from '@/pages/passwordPages/ChangePasswordPage.vue';
 import VerifyCode from '@/pages/passwordPages/VerifyCodePage.vue';
 import NewPassword from '@/pages/passwordPages/NewPasswordPage.vue';
-import UserDetails from '@/pages/userPages/userDetails/UserDatailsPage.vue'
+import UserDetails from '@/pages/userPages/userDetails/UserDetailsPage.vue'
 import Cart from '@/pages/cartPage/CartPage.vue'
 import Books from '@/pages/categoryPages/BooksPage.vue'
 import Thermos from '@/pages/categoryPages/ThermosPage.vue'
 import Stationery from '@/pages/categoryPages/StationeryPage.vue'
 import Clothes from '@/pages/categoryPages/ClothesPage.vue'
-import ConfirmPayPage from '@/pages/payPage/ConfirmPayPage.vue';
+import ConfirmPay from '@/pages/payPage/ConfirmPayPage.vue';
+import AdminDetails from '@/pages/adminPages/AdminDetailsPage.vue';
 
 const routesPages = [
   {path: '/', component: Home, name: 'Home'},
@@ -37,7 +38,8 @@ const routesPages = [
   {path: '/thermos', component: Thermos, name: 'Thermos'},
   {path: '/stationery', component: Stationery, name: 'Stationery'},
   {path: '/clothes', component: Clothes, name: 'Clothes'},
-  {path: '/messagePay', component: ConfirmPayPage, name: 'ConfirmPayPage'}
+  {path: '/messagePay', component: ConfirmPay, name: 'ConfirmPayPage'},
+  {path: '/adminManagement', component: AdminDetails, name: 'AdminDetails' }
 ]
 
 const router = createRouter({
