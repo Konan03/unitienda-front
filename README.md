@@ -60,10 +60,14 @@ Puedes acceder al proyecto clonando este repositorio y siguiendo las instruccion
 - ![NPM](https://img.shields.io/badge/-NPM-CB3837?logo=npm&logoColor=white&style=flat)
 
 ## 👥 Personas Contribuyentes
-Este proyecto está siendo desarrollado actualmente por una sola persona.
+Este proyecto está siendo desarrollado actualmente por dos personas, las cuales son estudiantes de la Universidad de Ibague.
 
 ## 💻 Personas Desarrolladoras del Proyecto
 - **Manuel Caicedo**  
   - ![GitHub](https://img.shields.io/badge/-GitHub-181717?logo=github&logoColor=white&style=flat): [https://github.com/Konan03](https://github.com/Konan03)
   - ![Email](https://img.shields.io/badge/-Email-D14836?logo=gmail&logoColor=white&style=flat): manuelcaicedo52@gmail.com
   - ![LinkedIn](https://img.shields.io/badge/-LinkedIn-0A66C2?logo=linkedin&logoColor=white&style=flat): [https://www.linkedin.com/in/jose-manuel-caicedo-perdomo/](https://www.linkedin.com/in/jose-manuel-caicedo-perdomo/)
+- **Laura Rojas**  
+  - ![GitHub](https://img.shields.io/badge/-GitHub-181717?logo=github&logoColor=white&style=flat): 
+  - ![Email](https://img.shields.io/badge/-Email-D14836?logo=gmail&logoColor=white&style=flat): 
+  - ![LinkedIn](https://img.shields.io/badge/-LinkedIn-0A66C2?logo=linkedin&logoColor=white&style=flat): 
