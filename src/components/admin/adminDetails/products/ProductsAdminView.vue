@@ -172,7 +172,7 @@ const onFileChange = (file) => {
 }
 
 .v-card {
-  border: 1px solid #8e8e8e;
+  border: 2px solid #12223d;
 }
 
 .text-profile {
@@ -215,7 +215,7 @@ const onFileChange = (file) => {
 }
 
 .scroll-container {
-  max-height: 400px; /* Altura máxima del área de productos */
+  max-height: 477px; /* Altura máxima del área de productos */
   overflow-y: auto; /* Habilitar scroll vertical */
   padding-right: 16px; /* Espacio para la barra de scroll */
 }

@@ -51,7 +51,7 @@ Puedes acceder al proyecto clonando este repositorio y siguiendo las instruccion
    ```
 
 5. **Accede al proyecto**
-   Una vez iniciado el servidor, puedes acceder a la aplicación en 🌍 http://localhost:8080 (localmente).
+   Una vez iniciado el servidor, puedes acceder a la aplicación en 🌍 http://localhost:3000 (localmente).
 
 ## 🛠️ Tecnologias usadas
 - ![Vue.js](https://img.shields.io/badge/-Vue.js-4FC08D?logo=vue.js&logoColor=white&style=flat) 
