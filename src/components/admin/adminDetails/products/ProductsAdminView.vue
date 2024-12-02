@@ -2,10 +2,13 @@
   <h2 class="text-profile">Productos</h2>
   <v-card class="mx-auto pa-5" max-width="1300">
     <v-container fluid>
-      <!-- Contenedor con scroll -->
       <v-card-text class="scroll-container">
-        <!-- Simular múltiples productos -->
-        <CardProductAdmin v-for="(product, index) in products" :key="index" />
+        <CardProductAdmin 
+          v-for="product in products" 
+          :key="product.id" 
+          :product="product" 
+          :recargarProductos="cargarProductos" 
+        />
       </v-card-text>
 
       <v-card-actions>
@@ -17,7 +20,7 @@
     </v-container>
   </v-card>
 
-  <!-- Modal de tamaño XL -->
+  <!-- Modal para agregar producto -->
   <v-dialog v-model="isDialogOpen" max-width="900px">
     <v-card rounded="xl">
       <v-card-title>
@@ -25,80 +28,49 @@
       </v-card-title>
 
       <v-card-text>
-        <!-- Formulario con campo para agregar una imagen -->
         <v-row>
-          <!-- Columna para agregar la imagen -->
           <v-col cols="12" md="4" class="d-flex flex-column align-center">
-            <!-- Donde se cargará la imagen -->
-            <div class="image-preview">
-              <img
-                v-if="selectedImage"
-                :src="selectedImage"
-                alt="Imagen del producto"
-                class="product-image"
-              />
-              <v-icon v-else class="placeholder-icon">mdi-image</v-icon>
+            <div v-for="(image, index) in previewImages" :key="index" class="image-preview">
+              <img :src="image" alt="Imagen del producto" class="product-image" />
             </div>
-
-            <!-- Ícono de carga de imagen que dispara la selección de archivo -->
             <v-btn icon @click="triggerFileInput">
               <v-icon>mdi-upload</v-icon>
             </v-btn>
-
-            <!-- Campo de archivo oculto -->
-            <input
-              ref="fileInput"
-              type="file"
-              accept="image/*"
-              style="display: none"
-              @change="onFileChange"
-            />
-
-            <p class="mt-2">Subir imagen</p>
+            <input ref="fileInput" type="file" accept="image/*" multiple style="display: none" @change="onFileChange" />
+            <p class="mt-2">Subir imágenes</p>
           </v-col>
 
-          <!-- Columna del formulario -->
           <v-col cols="12" md="8">
             <v-row>
               <v-col cols="12" md="6">
-                <v-text-field
-                  label="Nombre del producto"
-                  outlined
-                ></v-text-field>
+                <v-text-field label="Nombre del producto" v-model="newProduct.nombre" outlined></v-text-field>
               </v-col>
               <v-col cols="12" md="6">
-                <v-text-field label="Precio" outlined></v-text-field>
-              </v-col>
-
-              <v-col cols="12" md="6">
-                <v-text-field label="Tamaño" outlined></v-text-field>
+                <v-text-field label="Precio" v-model="newProduct.precio" outlined></v-text-field>
               </v-col>
               <v-col cols="12" md="6">
-                <v-btn color="#8E8E8E" class="btn-add-color" block>
+                <v-text-field label="Tamaño" v-model="newProduct.tamaño" outlined></v-text-field>
+              </v-col>
+              <v-col cols="12" md="6">
+                <v-btn color="#8E8E8E" class="btn-add-color" block @click="openColorDialog">
                   Agregar colores
                   <v-icon right>mdi-plus</v-icon>
                 </v-btn>
-              </v-col>
-
-              <v-col cols="12" md="6">
-                <v-select
-                  :items="
-                    Array.from({ length: 100 }, (_, i) => (i + 1).toString())
-                  "
-                  label="Stock"
-                  outlined
-                ></v-select>
+                <div v-if="colores.length" class="mt-2">
+                  <p>Colores añadidos:</p>
+                  <ul>
+                    <li v-for="(color, index) in colores" :key="index">{{ color }}</li>
+                  </ul>
+                </div>
               </v-col>
               <v-col cols="12" md="6">
-                <v-text-field label="Descuento" outlined></v-text-field>
+                <v-select :items="Array.from({ length: 100 }, (_, i) => (i + 1).toString())" label="Stock" v-model="newProduct.stock" outlined></v-select>
               </v-col>
-
+              <v-col cols="12" md="6">
+                <v-text-field label="Descuento" v-model="newProduct.descuento" outlined></v-text-field>
+              </v-col>
               <v-col cols="12">
-                <v-select
-                  :items="['Categoria 1', 'Categoria 2']"
-                  label="Categoría"
-                  outlined
-                ></v-select>
+                <v-select :items="['Libros', 'Termos', 'Papeleria', 'Ropa']" label="Categoría" v-model="newProduct.categoria" outlined></v-select>
               </v-col>
             </v-row>
           </v-col>
@@ -111,58 +83,154 @@
       </v-card-actions>
     </v-card>
   </v-dialog>
+
+  <!-- Diálogo para seleccionar colores -->
+  <v-dialog v-model="isColorDialogOpen" max-width="500px">
+    <v-card>
+      <v-card-title>
+        <span class="headline">Seleccionar Colores</span>
+      </v-card-title>
+      <v-card-text>
+        <v-select v-model="coloresSeleccionados" :items="coloresDisponibles" label="Elige uno o más colores" multiple outlined></v-select>
+      </v-card-text>
+      <v-card-actions>
+        <v-btn color="#486594" @click="agregarColores">Agregar Colores Seleccionados</v-btn>
+        <v-btn text @click="closeColorDialog">Cancelar</v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
 </template>
 
 <script setup>
+import { ref, onMounted, onUnmounted } from "vue";
 import CardProductAdmin from "./CardProductAdmin.vue";
-import { ref } from "vue";
+import { agregarProducto, obtenerProductos } from "../../../../service/productService.js";
 
-// Simular un listado de productos
-const products = ref([
-  { name: "Producto 1" },
-  { name: "Producto 2" },
-  { name: "Producto 3" },
-  { name: "Producto 4" },
-  { name: "Producto 5" },
-  { name: "Producto 6" },
-  { name: "Producto 7" },
-  { name: "Producto 8" },
-]);
+const products = ref([]);
+const newProduct = ref({
+  nombre: "",
+  precio: "",
+  tamaño: "",
+  stock: "",
+  descuento: "",
+  categoria: "",
+  imagenes: [],
+});
+const colores = ref([]);
+const coloresSeleccionados = ref([]);
+const coloresDisponibles = ref(["Rojo", "Azul", "Verde", "Amarillo", "Negro", "Blanco", "Morado", "Naranja", "Gris", "Rosa"]);
+const isDialogOpen = ref(false);
+const isColorDialogOpen = ref(false);
+const selectedImages = ref([]);
+const previewImages = ref([]); // Lista para almacenar las URLs de las imágenes de vista previa
+const fileInput = ref(null);
 
-const isDialogOpen = ref(false); // Controlar si el modal está abierto o cerrado
-const selectedImage = ref(null); // Imagen seleccionada para previsualización
-const fileInput = ref(null); // Referencia al input de archivo
+const cargarProductos = async () => {
+  try {
+    products.value = await obtenerProductos();
+  } catch (error) {
+    console.error("Error al cargar productos:", error);
+  }
+};
+onMounted(cargarProductos);
 
 const openDialog = () => {
-  isDialogOpen.value = true; // Abre el modal
+  isDialogOpen.value = true;
 };
 
 const closeDialog = () => {
-  isDialogOpen.value = false; // Cierra el modal
+  isDialogOpen.value = false;
+  resetForm();
 };
 
-const saveProduct = () => {
-  // Aquí va la lógica para guardar el producto
-  console.log("Producto guardado");
-  closeDialog(); // Cierra el modal después de guardar el producto
+const openColorDialog = () => {
+  isColorDialogOpen.value = true;
 };
 
-// Función para abrir el selector de archivos
-const triggerFileInput = () => {
-  fileInput.value.click(); // Dispara la selección de archivo
+const closeColorDialog = () => {
+  isColorDialogOpen.value = false;
 };
 
-// Función para manejar el cambio de imagen
-const onFileChange = (file) => {
-  if (file) {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      selectedImage.value = e.target.result;
-    };
-    reader.readAsDataURL(file);
-    console.log("Archivo seleccionado:", file);
+const agregarColores = () => {
+  colores.value = [...new Set([...colores.value, ...coloresSeleccionados.value])];
+  coloresSeleccionados.value = [];
+  closeColorDialog();
+};
+
+const saveProduct = async () => {
+  try {
+    const formData = new FormData();
+
+    formData.append("producto", JSON.stringify({
+      nombre: newProduct.value.nombre,
+      precio: newProduct.value.precio,
+      tamaño: newProduct.value.tamaño,
+      stock: newProduct.value.stock,
+      descuento: newProduct.value.descuento || 0,
+      categoria: newProduct.value.categoria,
+      colores: colores.value.length ? colores.value : ["No aplica"],
+      imagenes: []
+    }));
+
+    selectedImages.value.forEach((file) => {
+      formData.append("imagenes", file);
+    });
+
+    await agregarProducto(formData);
+    closeDialog();
+    cargarProductos();
+  } catch (error) {
+    console.error("Error al agregar producto:", error);
   }
 };
+
+const resetForm = () => {
+  newProduct.value = {
+    nombre: "",
+    precio: "",
+    tamaño: "",
+    stock: "",
+    descuento: "",
+    categoria: "",
+    imagenes: [],
+  };
+  colores.value = [];
+  selectedImages.value = [];
+  previewImages.value.forEach((url) => URL.revokeObjectURL(url)); // Liberar las URLs de las imágenes previas
+  previewImages.value = [];
+};
+
+const onFileChange = (event) => {
+  const nuevasImagenes = Array.from(event.target.files);
+  selectedImages.value = [...selectedImages.value, ...nuevasImagenes];
+
+  nuevasImagenes.forEach((file) => {
+    previewImages.value.push(URL.createObjectURL(file));
+  });
+
+  console.log("Total de imágenes seleccionadas:", selectedImages.value.length);
+  selectedImages.value.forEach((file, index) => {
+    console.log(`Imagen seleccionada (${index + 1}):`, file.name);
+  });
+};
+
+const triggerFileInput = () => {
+  fileInput.value.click();
+};
+
+const formatPrice = (price) => {
+  return new Intl.NumberFormat("es-CO", {
+    style: "currency",
+    currency: "COP",
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0
+  }).format(price).replace(",00", "");
+};
+
+// Liberar URLs de vista previa al desmontar
+onUnmounted(() => {
+  previewImages.value.forEach((url) => URL.revokeObjectURL(url));
+});
 </script>
 
 <style scoped>
@@ -170,26 +238,20 @@ const onFileChange = (file) => {
   margin-left: 1000px;
   margin-top: 4px;
 }
-
 .v-card {
   border: 2px solid #12223d;
 }
-
 .text-profile {
   font-size: 60px;
   color: #fab400;
   margin-bottom: 19px;
   margin-left: 70px;
 }
-
-/* Imagen del producto */
 .product-image {
   max-width: 100%;
   max-height: 200px;
   object-fit: contain;
 }
-
-/* Estilos para la vista previa de imagen y su ícono */
 .image-preview {
   width: 200px;
   height: 200px;
@@ -197,26 +259,22 @@ const onFileChange = (file) => {
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-bottom: 50px;
+  margin-bottom: 10px;
 }
-
 .placeholder-icon {
   font-size: 64px;
   color: #ddd;
 }
-
-/* Botón de agregar colores */
 .btn-add-color {
-  height: 56px; /* Altura para igualar a los campos de texto */
+  height: 56px;
   display: inline-flex;
   justify-content: center;
   align-items: center;
   width: 100%;
 }
-
 .scroll-container {
-  max-height: 477px; /* Altura máxima del área de productos */
-  overflow-y: auto; /* Habilitar scroll vertical */
-  padding-right: 16px; /* Espacio para la barra de scroll */
+  max-height: 477px;
+  overflow-y: auto;
+  padding-right: 16px;
 }
 </style>
