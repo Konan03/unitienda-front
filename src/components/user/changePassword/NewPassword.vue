@@ -6,63 +6,98 @@
       elevation="5"
       max-width="800px"
     >
-      <!-- Título -->
       <h1 class="title text-center">Nueva Contraseña</h1>
       <p class="subtitle text-center">
-        Ingrese se nueva contraseña               
+        Ingresa tu nueva contraseña.
       </p>
 
-      <!-- Formulario -->
       <v-form>
-        <!-- Campo de Email -->
         <v-text-field
           label="Contraseña"
           v-model="password"
-          type="password"
+          :type="showPassword ? 'text' : 'password'"
           outlined
           dense
           hint="La contraseña debe tener como mínimo 6 caracteres"
           persistent-hint
           class="custom-text-field"
+          :rules="[v => !!v || 'La contraseña es requerida', v => v.length >= 6 || 'Mínimo 6 caracteres']"
         ></v-text-field>
 
         <v-text-field
           label="Confirmar contraseña"
-          v-model="password"
-          type="password"
+          v-model="confirmPassword"
+          :type="showPassword ? 'text' : 'password'"
           outlined
           dense
           class="custom-text-field"
+          :rules="[v => v === password || 'Las contraseñas no coinciden']"
         ></v-text-field>
-        
 
-        <!-- Botones en columna -->
+        <v-checkbox
+          v-model="showPassword"
+          label="Mostrar contraseñas"
+          class="mt-3 mb-3"
+        ></v-checkbox>
+
+        <v-alert v-if="errorMessage" type="error" dense>{{ errorMessage }}</v-alert>
+        <v-alert v-if="successMessage" type="success" dense>{{ successMessage }}</v-alert>
+
         <v-btn
           class="custom-button continue-button mb-3"
           @click="handleContinue"
-          >Aceptar</v-btn
-        >
+        >Aceptar</v-btn>
       </v-form>
     </v-card>
   </v-container>
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
+import { resetPassword } from '.../../../../../service/userService.js'; // Asegúrate de que el path sea correcto
 
+const password = ref("");
+const confirmPassword = ref("");
 const email = ref("");
+const errorMessage = ref("");
+const successMessage = ref("");
+const valid = ref(true);
+const showPassword = ref(false);
 const router = useRouter();
 
-// Manejar acciones de los botones
-function handleContinue() {
-  console.log("Email ingresado:", email.value);
-}
+onMounted(() => {
+  // Recuperar el email desde localStorage
+  email.value = localStorage.getItem("email");
+});
 
+// Manejar acción del botón "Aceptar"
+async function handleContinue() {
+  if (valid.value && password.value === confirmPassword.value) {
+    try {
+      const response = await resetPassword(email.value, password.value);
+      console.log("Respuesta del backend:", response);
+
+      successMessage.value = "Contraseña actualizada exitosamente.";
+      errorMessage.value = ""; // Limpia el mensaje de error en caso de éxito
+
+      // Limpiar el email de localStorage después de cambiar la contraseña
+      localStorage.removeItem("email");
+
+      setTimeout(() => router.push({ name: 'Login' }), 2000);
+    } catch (error) {
+      errorMessage.value = error.response?.data?.message || "Error al actualizar la contraseña. Intente nuevamente.";
+      successMessage.value = "";
+      console.error("Error al actualizar la contraseña:", error);
+    }
+  } else {
+    errorMessage.value = "Por favor, complete todos los campos correctamente.";
+    successMessage.value = "";
+  }
+}
 </script>
 
-<style>
-/* Título y subtítulo */
+<style scoped>
 .title {
   font-size: 2.5rem;
   font-weight: 700;
@@ -79,50 +114,41 @@ function handleContinue() {
 }
 
 .border-shadow {
-  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1); /* Sombreado */
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
   border-radius: 10px;
 }
 
 .custom-text-field {
-  width: 400px; /* Ajusta el tamaño del campo de texto */
-  margin-bottom: 20px; /* Espacio debajo del campo */
+  width: 400px;
+  margin-bottom: 20px;
   margin: 0 auto;
-  margin-bottom: 30px;
 }
 
-/* Botones iguales */
 .custom-button {
-  background-color: #0f1f39 !important; /* Color del botón por defecto */
-  color: white !important; /* Color del texto del botón */
-  font-size: 1rem; /* Tamaño de fuente */
-  padding: 10px 24px; /* Ajuste del padding */
-  border-radius: 10px; /* Bordes más redondeados */
-  width: 200px; /* El botón ocupa el 100% del ancho del card */
-  height: 50px !important; /* Altura consistente para ambos botones */
+  background-color: #0f1f39 !important;
+  color: white !important;
+  font-size: 1rem;
+  padding: 10px 24px;
+  border-radius: 10px;
+  width: 200px;
+  height: 50px;
   display: flex;
   justify-content: center;
   align-items: center;
-  margin: 0 auto; /* Centra el botón horizontalmente */
+  margin: 0 auto;
   margin-bottom: 50px !important;
 }
 
-/* Modificación del botón "Volver" */
-.voltar-button {
-  background-color: #8e8e8e !important; /* Color del botón de volver */
-  color: black !important; /* Color del texto del botón de volver */
+.v-alert {
+  margin-bottom: 20px;
 }
 
-.resend-container {
-  margin-top: 10px; /* Pega el texto al campo de contraseña */
-  margin-bottom: 30px; /* Añade un espacio antes del botón */
-}
-.resend {
-  font-size: 1rem;
-  color: #8e8e8e;
-  text-decoration: none;
+.success-alert {
+  background-color: #e0f7e9 !important; /* Color de fondo verde claro para éxito */
+  color: #2e7d32 !important; /* Color de texto verde oscuro */
+  margin-bottom: 20px;
+  border-radius: 5px;
+ 
 }
 
-.resend:hover {
-  text-decoration: underline;
-}
 </style>

@@ -3,121 +3,181 @@
     <v-row>
       <v-col cols="12" md="8">
         <v-row>
-          <v-col cols="12"> <strong>Total:</strong> $38.000 </v-col>
           <v-col cols="12">
-            <strong>Fecha del pedido:</strong> 20 de octubre de 2024
+            <strong>Total:</strong> ${{ props.order.total || 'N/A' }}
+          </v-col>
+          <v-col cols="12">
+            <strong>Fecha del pedido:</strong> {{ formatDate(props.order.fechaCreacion) || 'No disponible' }}
           </v-col>
         </v-row>
       </v-col>
       <v-col cols="12" md="4" class="text-right">
         <v-row>
           <v-col cols="12">
-            <strong>#1289238239</strong>
+            <strong>#{{ props.order.numeroPedido || 'Sin ID' }}</strong>
           </v-col>
           <v-col cols="12">
-            <v-chip color="#6FF14B" class="ml-2 custom-chip"
-              ><span class="chip-text">Enviando pedido</span></v-chip
-            >
+            <v-chip :color="orderStateColor" class="ml-2 custom-chip">
+              <span class="chip-text">{{ orderState }}</span>
+            </v-chip>
           </v-col>
         </v-row>
       </v-col>
     </v-row>
 
-    <v-divider class="my-4"></v-divider>
+    <v-divider class="my-2"></v-divider>
 
+    <!-- Mostrar detalles del primer producto y los botones alineados con él -->
     <v-row>
-      <v-col cols="12" md="2"> </v-col>
-      <v-col cols="12" md="6" class="d-flex align-items-center">
-        <img
-          src="/src/assets/img/image 3.png"
-          alt="Termo Blanco"
-          class="product-image mr-5"
-        />
+      <v-col cols="12" md="2" class="text-center">
+        <img :src="getProductImage(props.order.detalles[0]?.producto?.imagenes)" alt="Imagen del producto" class="product-image" />
+      </v-col>
+      <v-col cols="12" md="6">
         <div>
-          <p><strong>Termo Blanco 800Ml</strong></p>
-          <p>Entrega hasta el 28/10/2024</p>
-          <p>1 ud. $34.900</p>
+          <p><strong>{{ props.order.detalles[0]?.producto?.nombre || 'Producto desconocido' }}</strong></p>
+          <p>Entrega hasta el {{ formatDate(props.order.fechaMaximaEntrega) || 'No disponible' }}</p>
+          <p>{{ props.order.detalles[0]?.cantidad || 1 }} ud. ${{ props.order.detalles[0]?.producto?.precio || 'N/A' }}</p>
         </div>
       </v-col>
       <v-col cols="12" md="4" class="text-right">
-        <v-btn color="#486594" class="mb-2 border-btn">Pedir de nuevo</v-btn>
-        <v-btn
-          color="#FAB400"
-          outlined
-          class="white-text-btn"
-          @click="openDialog"
-          >ver detalles del pedido</v-btn
-        >
+        <v-btn color="#FAB400" outlined class="white-text-btn" @click="openDialog">
+          Ver detalles del pedido
+        </v-btn>
+        
+        <!-- Botón de cancelar pedido -->
+        <v-btn color="red darken-1" outlined class="white-text-btn cancel-btn" @click="openCancelDialog">
+          Cancelar pedido
+        </v-btn>
       </v-col>
     </v-row>
+
+    <!-- Mostrar detalles de los productos restantes -->
+    <v-row v-for="(detalle, index) in props.order.detalles.slice(1)" :key="index">
+      <v-col cols="12" md="2" class="text-center">
+        <img :src="getProductImage(detalle.producto?.imagenes)" alt="Imagen del producto" class="product-image" />
+      </v-col>
+      <v-col cols="12" md="10">
+        <div>
+          <p><strong>{{ detalle.producto?.nombre || 'Producto desconocido' }}</strong></p>
+          <p>Entrega hasta el {{ formatDate(props.order.fechaMaximaEntrega) || 'No disponible' }}</p>
+          <p>{{ detalle.cantidad || 1 }} ud. ${{ detalle.producto?.precio || 'N/A' }}</p>
+        </div>
+      </v-col>
+    </v-row>
+
+    <!-- Modal detalles de pedido -->
+    <v-dialog v-model="isDialogOpen" max-width="1000px">
+      <v-card rounded="xl">
+        <v-card-title>
+          <span class="headline">Pedido #{{ props.order.numeroPedido || 'Sin ID' }}</span>
+        </v-card-title>
+        <v-card-text>
+          <v-row>
+            <CardAddressInfo :direccion="order.direccion" title="Dirección de Envío" />
+            <CardPaymentInfo :metodoPago="order.metodoPago" :monto="order.total"/>
+            <v-col cols="12" md="4"><CardSummaryInfo :subtotal="order.subtotal" :costoEnvio="order.costoEnvio" :total="order.total"/></v-col>
+          </v-row>
+          <CardStateInfo :ordenId="order.id" :estadoActual="order.estado" />
+          <v-row>
+            <v-col cols="12">
+              <div class="scroll-container">
+                <CardOrdeInfo :order="order"/>
+              </div>
+            </v-col>
+          </v-row>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="blue darken-1" text @click="closeDialog">Cerrar</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
+    <!-- Diálogo de confirmación de cancelación -->
+    <v-dialog v-model="isCancelDialogOpen" max-width="400px">
+      <v-card>
+        <v-card-title class="headline">Confirmación</v-card-title>
+        <v-card-text>
+          ¿Estás seguro de cancelar el pedido?
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="red" text @click="confirmCancelOrder">Sí</v-btn>
+          <v-btn color="blue darken-1" text @click="closeCancelDialog">No</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </v-card>
-
-  <!-- Modal detalles de pedido -->
-  <v-dialog v-model="isDialogOpen" max-width="1000px">
-    <v-card rounded="xl">
-      <v-card-title>
-        <span class="headline">Pedido #1289238239</span>
-      </v-card-title>
-
-      <v-card-text>
-        <!-- Aquí puedes incluir más detalles del pedido -->
-        <v-row>
-          <v-col cols="12" md="4">
-            <CardAddressInfo />
-          </v-col>
-          <v-col cols="12" md="4">
-            <CardPaymentInfo />
-          </v-col>
-          <v-col cols="12" md="4">
-            <CardSummaryInfo />
-          </v-col>
-        </v-row>
-        <CardStateInfo />
-        <!-- Sección con scroll -->
-        <v-row>
-          <v-col cols="12">
-            <div class="scroll-container">
-              <CardOrdeInfo class="ml-4" v-for="i in 6" :key="i" />
-            </div>
-          </v-col>
-        </v-row>
-      </v-card-text>
-
-      <v-card-actions>
-        <v-spacer></v-spacer>
-        <v-btn color="blue darken-1" text @click="closeCard">Cerrar</v-btn>
-      </v-card-actions>
-    </v-card>
-  </v-dialog>
 </template>
 
 <script setup>
-import { ref } from "vue";
-import CardAddressInfo from "./cardsInfo/CardAddressInfo.vue";
-import CardPaymentInfo from "./cardsInfo/CardPaymentInfo.vue";
-import CardSummaryInfo from "./cardsInfo/CardSummaryInfo.vue";
-import CardStateInfo from "./cardsInfo/CardStateInfo.vue";
-import CardOrdeInfo from "./cardsInfo/CardOrdeInfo.vue";
+import { ref, defineProps, computed } from 'vue';
+import orderService from '@/service/orderService'; // Asegúrate de importar correctamente la ruta
+import CardAddressInfo from './cardsInfo/CardAddressInfo.vue';
+import CardPaymentInfo from './cardsInfo/CardPaymentInfo.vue';
+import CardSummaryInfo from './cardsInfo/CardSummaryInfo.vue';
+import CardStateInfo from './cardsInfo/CardStateInfo.vue';
+import CardOrdeInfo from './cardsInfo/CardOrdeInfo.vue';
 
-// Variable reactiva para controlar la visibilidad del modal
+const props = defineProps({
+  order: {
+    type: Object,
+    required: true,
+  },
+});
+
 const isDialogOpen = ref(false);
+const isCancelDialogOpen = ref(false); // Control del diálogo de confirmación de cancelación
 
-// Función para abrir el modal
-const openDialog = () => {
-  isDialogOpen.value = true;
+// Computed para reflejar el estado y el color del estado de forma reactiva
+const orderState = computed(() => props.order.estado || 'Desconocido');
+const orderStateColor = computed(() => (orderState.value === 'CANCELADO' ? 'red' : props.order.estadoColor || 'grey'));
+
+const getProductImage = (imagenes) => {
+  if (imagenes && Array.isArray(imagenes) && imagenes.length > 0) {
+    return `http://localhost:8080/images/${imagenes[0]}`;
+  }
+  return '/src/assets/img/libro.png';
 };
 
-// Función para cerrar la tarjeta (simulada)
-const closeCard = () => {
-  isDialogOpen.value = false; // Cierra el modal
+const openDialog = () => { isDialogOpen.value = true; };
+const closeDialog = () => { isDialogOpen.value = false; };
+
+// Funciones para abrir y cerrar el diálogo de cancelación
+const openCancelDialog = () => { isCancelDialogOpen.value = true; };
+const closeCancelDialog = () => { isCancelDialogOpen.value = false; };
+
+// Función para cancelar la orden en el backend usando orderService
+const cancelarOrden = async (ordenId) => {
+  try {
+    const response = await orderService.cancelarOrden(ordenId); // Llamada al servicio
+    return response;
+  } catch (error) {
+    console.error(`Error al cancelar la orden con ID ${ordenId}:`, error);
+    throw error;
+  }
+};
+
+// Función para confirmar la cancelación
+const confirmCancelOrder = async () => {
+  try {
+    await cancelarOrden(props.order.id);
+    props.order.estado = 'CANCELADO'; // Actualizamos el estado a "CANCELADO"
+    alert("El pedido ha sido cancelado exitosamente.");
+    closeCancelDialog(); // Cierra el diálogo después de confirmar
+  } catch (error) {
+    alert("Hubo un error al cancelar el pedido. Por favor, intenta nuevamente.");
+  }
+};
+
+const formatDate = (dateString) => {
+  if (!dateString) return 'No disponible';
+  const options = { year: 'numeric', month: 'long', day: 'numeric' };
+  return new Date(dateString).toLocaleDateString(undefined, options);
 };
 </script>
 
 <style scoped>
-.v-btn {
-  min-width: 160px;
-}
-
 .main-card {
   border: 1px solid #979797;
 }
@@ -127,42 +187,44 @@ const closeCard = () => {
 }
 
 .product-image {
-  width: 50px; /* Ajusta el ancho */
-  height: auto; /* Mantiene la proporción original de la imagen */
-  margin-left: -180px;
+  width: 70px;
+  height: auto;
+  margin-left: auto;
+  margin-right: auto;
+  display: block;
 }
 
 .border-btn {
   border-radius: 10px;
+  margin-bottom: 8px;
 }
 
 .white-text-btn {
-  color: white !important; /* Cambia el color del texto a blanco */
-  border-color: white !important; /* Opcional: cambiar el color del borde */
+  color: white !important;
+  border-color: white !important;
   border-radius: 10px;
 }
 
 .custom-chip {
-  background-color: #6ff14b !important; /* Color de fondo más fuerte */
+  background-color: #6ff14b !important;
   border-radius: 10px;
 }
+
 .chip-text {
-  color: white !important; /* Asegura que el texto sea blanco */
-  font-weight: bold; /* Hace el texto más visible */
+  color: white !important;
+  font-weight: bold;
 }
 
 .scroll-container {
   max-height: 300px;
   overflow-y: auto;
-  padding-right: 16px; /* Espacio para la barra de scroll */
+  padding-right: 16px;
 }
 
-/* Estilo para el contenedor de scroll */
-.scroll-container {
-  max-height: 300px; /* Ajusta la altura del área de scroll */
-  overflow-y: auto;
-  padding-right: 16px; /* Espacio para la barra de scroll */
-  border: 2px solid #979797; /* Agrega un borde */
-  border-radius: 4px;
+/* Estilo adicional para el botón de cancelar */
+.cancel-btn {
+  color: white !important;
+  border-color: red !important;
+  margin-top: 10px;
 }
 </style>

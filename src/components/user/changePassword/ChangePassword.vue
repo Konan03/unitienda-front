@@ -1,12 +1,6 @@
 <template>
   <v-container class="d-flex flex-column align-center justify-center">
-    <v-card
-      class="mx-auto my-5 border-shadow pa-5"
-      outlined
-      elevation="5"
-      max-width="800px"
-      
-    >
+    <v-card class="mx-auto my-5 border-shadow pa-5" outlined elevation="5" max-width="800px">
       <!-- Título -->
       <h1 class="title text-center">Cambio de contraseña</h1>
       <p class="subtitle text-center">
@@ -15,7 +9,7 @@
       </p>
 
       <!-- Formulario -->
-      <v-form>
+      <v-form ref="resetForm" v-model="valid">
         <!-- Campo de Email -->
         <v-text-field
           label="Email"
@@ -24,12 +18,15 @@
           outlined
           dense
           class="custom-text-field"
+          :rules="[v => !!v || 'El email es requerido', v => /.+@.+\..+/.test(v) || 'Email no válido']"
         ></v-text-field>
 
-        <!-- Botones en columna -->
-        <v-btn  class="custom-button continue-button mb-3" @click="handleContinue">Continuar</v-btn>
-        <v-btn class="custom-button voltar-button  " @click="handleBack">Volver</v-btn>
+        <!-- Mensaje de error -->
+        <v-alert v-if="errorMessage" type="error" dense>{{ errorMessage }}</v-alert>
 
+        <!-- Botones en columna -->
+        <v-btn class="custom-button continue-button mb-3" @click="handleContinue">Continuar</v-btn>
+        <v-btn class="custom-button voltar-button" @click="handleBack">Volver</v-btn>
       </v-form>
     </v-card>
   </v-container>
@@ -37,20 +34,39 @@
 
 <script setup>
 import { ref } from "vue";
-import { useRouter } from 'vue-router'; 
+import { useRouter } from 'vue-router';
+import { sendResetPasswordCode } from '.../../../../../service/userService.js';  // Asegúrate de que el path sea correcto
 
 const email = ref("");
-const router = useRouter()
+const errorMessage = ref("");
+const router = useRouter();
+const valid = ref(true);
 
-// Manejar acciones de los botones
-function handleContinue() {
-  console.log("Email ingresado:", email.value);
-  router.push({name: 'VerifyCode'})
+// Manejar acción del botón "Continuar"
+async function handleContinue() {
+  if (valid.value) {
+    try {
+      // Guardar el email en localStorage
+      localStorage.setItem('email', email.value);
+
+      // Enviar el código de restablecimiento
+      const response = await sendResetPasswordCode(email.value);
+      console.log("Respuesta del backend:", response);  // Confirmación en consola
+      errorMessage.value = "";  // Limpia el mensaje de error en caso de éxito
+
+      // Redirigir a la siguiente página
+      router.push({ name: 'VerifyCode' });
+    } catch (error) {
+      errorMessage.value = error.response?.data?.message || "Error al enviar el código. Intente nuevamente.";
+    }
+  } else {
+    errorMessage.value = "Por favor, ingrese un email válido.";
+  }
 }
 
+// Manejar acción del botón "Volver"
 function handleBack() {
-  console.log("Volver a la página anterior");
-  router.push({name: 'Login'})
+  router.push({ name: 'Login' });
 }
 </script>
 
@@ -72,39 +88,34 @@ function handleBack() {
 }
 
 .border-shadow {
-  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1); /* Sombreado */
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
   border-radius: 10px;
 }
 
 .custom-text-field {
-  width: 400px; /* Ajusta el tamaño del campo de texto */
-  margin-bottom: 20px; /* Espacio debajo del campo */
+  width: 400px;
+  margin-bottom: 20px;
   margin: 0 auto;
-  margin-bottom: 40px;
 }
 
-/* Botones iguales */
 .custom-button {
-  background-color: #0f1f39 !important; /* Color del botón por defecto */
-  color: white !important; /* Color del texto del botón */
-  font-size: 1rem; /* Tamaño de fuente */
-  padding: 10px 24px; /* Ajuste del padding */
-  border-radius: 10px; /* Bordes más redondeados */
-  width: 200px; /* El botón ocupa el 100% del ancho del card */
-  height: 50px; /* Altura consistente para ambos botones */
+  background-color: #0f1f39 !important;
+  color: white !important;
+  font-size: 1rem;
+  padding: 10px 24px;
+  border-radius: 10px;
+  width: 200px;
+  height: 50px;
   display: flex;
   justify-content: center;
   align-items: center;
-  margin: 0 auto; /* Centra el botón horizontalmente */
+  margin: 0 auto;
   margin-bottom: 20px !important;
 }
 
-/* Modificación del botón "Volver" */
 .voltar-button {
-  background-color: #8E8E8E !important; /* Color del botón de volver */
-  color: black !important; /* Color del texto del botón de volver */
+  background-color: #8E8E8E !important;
+  color: black !important;
   margin-bottom: 50px !important;
 }
-
-
 </style>

@@ -1,24 +1,24 @@
 <template>
-  <h2 class="title">Metodos de pago</h2>
+  <h2 class="title">Métodos de pago</h2>
   <v-card class="mx-auto pa-5 main-card" max-width="1300">
     <v-container class="scroll-container" fluid>
       <v-row>
         <v-col
           v-for="(payment, index) in payments"
-          :key="index"
-          ols="12"
+          :key="payment.id"
+          cols="12"
           md="6"
           lg="4"
           xl="3"
           class="mb-4"
         >
-          <CardPayment />
+          <CardPayment :payment="payment" @updated="loadUserCards" />
         </v-col>
       </v-row>
     </v-container>
     <v-card-actions class="btn">
       <v-btn text color="#486594" @click="openAddDialog">
-        Añadir metodo de pago
+        Añadir método de pago
         <v-icon right size="30">mdi-plus</v-icon>
       </v-btn>
     </v-card-actions>
@@ -27,39 +27,68 @@
   <!-- Modal para añadir método de pago -->
   <v-dialog v-model="isAddDialogOpen" max-width="600px">
     <v-card rounded="xl">
-      <v-card-title class="headline">Añadir Método de Pago</v-card-title>
-      <v-card-subtitle color="#051024">Ingresar una tarjeta de debito o credito</v-card-subtitle>
+      <v-card-title class="headline"> Añadir Método de Pago</v-card-title>
+      <v-card-subtitle color="#051024">Ingresar una tarjeta de débito o crédito</v-card-subtitle>
 
       <v-card-text>
         <v-form>
-          <v-text-field rounded="lg" label="Número de tarjeta" placeholder="2837 1282 1228 1929" outlined></v-text-field>
-          <v-text-field rounded="lg" label="Nombre del titular" placeholder="Laura Rojas" outlined></v-text-field>
+          <v-text-field
+            v-model="newCard.numeroTarjeta"
+            rounded="lg"
+            label="Número de tarjeta"
+            placeholder="2837 1282 1228 1929"
+            outlined
+            maxlength="20"
+          >
+            <template v-slot:prepend-inner>
+              <img v-if="cardIcon" :src="cardIcon" alt="Card Icon" style="width: 30px; height: 30px; object-fit: contain; margin-right: 10px;" />
+            </template>
+          </v-text-field>
+          <v-text-field
+            v-model="newCard.nombreTitular"
+            rounded="lg"
+            label="Nombre del titular"
+            placeholder="Laura Rojas"
+            outlined
+          ></v-text-field>
 
           <h4 color="#051024">Fecha de vencimiento</h4>
           <v-row>
-            <v-col cols="4">
+            <v-col cols="6">
               <v-select
                 :items="months"
                 label="Mes"
-                v-model="selectedMonth"
+                v-model="newCard.mesExpiracion"
                 outlined
                 rounded="lg"
               ></v-select>
             </v-col>
-            <v-col cols="4">
+            <v-col cols="6">
               <v-select
                 :items="years"
                 label="Año"
-                v-model="selectedYear"
+                v-model="newCard.anoExpiracion"
                 outlined
                 rounded="lg"
               ></v-select>
             </v-col>
           </v-row>
-          
-          <v-text-field rounded="lg" label="CVV" placeholder="478" outlined></v-text-field>
+
+          <v-radio-group v-model="newCard.tipoTarjeta" row>
+            <v-radio label="Crédito" value="CREDITO"></v-radio>
+            <v-radio label="Débito" value="DEBITO"></v-radio>
+          </v-radio-group>
+
+          <v-text-field
+            v-model="newCard.cvv"
+            rounded="lg"
+            label="CVV"
+            placeholder="478"
+            outlined
+          ></v-text-field>
         </v-form>
       </v-card-text>
+      <v-card-text v-if="errorMessage" class="error-message" style="color: red;">{{ errorMessage }}</v-card-text>
       <v-card-actions>
         <v-btn text @click="isAddDialogOpen = false">Cerrar</v-btn>
         <v-btn color="#486594" @click="savePaymentMethod">Guardar</v-btn>
@@ -69,94 +98,114 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, onMounted, computed } from "vue";
 import CardPayment from "./CardPayment.vue";
+import { obtenerTarjetasUsuario, guardarTarjeta } from "../../../../service/cardService.js";
 
-// Estado del modal para añadir método de pago
+
 const isAddDialogOpen = ref(false);
+const payments = ref([]);
 
-const payments = [
-{ id: 1, name: "123456" },
-{ id: 2, name: "123456" },
-{ id: 3, name: "123456" },
-{ id: 4, name: "123456" },
-{ id: 5, name: "123456" },
-{ id: 6, name: "123456" },
-{ id: 7, name: "123456" },
-{ id: 8, name: "123456" },
-{ id: 9, name: "123456" },
-{ id: 10, name: "123456" },
-{ id: 11, name: "123456" },
-{ id: 12, name: "123456" },
-{ id: 13, name: "123456" },
-{ id: 14, name: "123456" },
-{ id: 15, name: "123456" },
-{ id: 16, name: "123456" },
-{ id: 17, name: "123456" },
-{ id: 18, name: "123456" },
-{ id: 19, name: "123456" },
-{ id: 20, name: "123456" },
-{ id: 21, name: "123456" },
-{ id: 22, name: "123456" },
-{ id: 23, name: "123456" },
+const newCard = ref({
+  numeroTarjeta: "",
+  nombreTitular: "",
+  mesExpiracion: null,
+  anoExpiracion: null,
+  tipoTarjeta: "CREDITO", // valor por defecto
+  cvv: ""
+});
 
-];
-// Control para el formulario del modal (días, meses, años)
-const months = Array.from({ length: 12 }, (_, i) => (i + 1).toString().padStart(2, "0")); // Meses del 01 al 12
+const errorMessage = ref("");
+
+// Obtener el icono de tarjeta según el tipo
+
+
+import visaIcon from '@/assets/visaIcon.png';
+import mastercardIcon from '@/assets/mastercardIcon.png';
+
+const cardIcon = computed(() => {
+  if (newCard.value.numeroTarjeta.startsWith("4")) {
+    return visaIcon;
+  } else if (newCard.value.numeroTarjeta.startsWith("5")) {
+    return mastercardIcon;
+  } else {
+    return '';
+  }
+});
+
+// Meses y años para los selectores de fecha de vencimiento
+const months = Array.from({ length: 12 }, (_, i) => (i + 1).toString().padStart(2, "0"));
 const currentYear = new Date().getFullYear();
-const years = Array.from({ length: 61 }, (_, i) => (currentYear - 30 + i).toString()); // Años desde el pasado
+const years = Array.from({ length: 20 }, (_, i) => (currentYear + i).toString());
 
+// Cargar las tarjetas del usuario al montar el componente
+onMounted(async () => {
+  await loadUserCards();
+});
 
+// Función para cargar las tarjetas del usuario
+const loadUserCards = async () => {
+  try {
+    const response = await obtenerTarjetasUsuario();
+    payments.value = response;
+  } catch (error) {
+    console.error("Error al cargar tarjetas:", error);
+  }
+};
 
-// Función para abrir el modal
+// Función para abrir el modal para añadir una tarjeta
 const openAddDialog = () => {
   isAddDialogOpen.value = true;
 };
 
-// Función para simular la acción de guardar el método de pago
-const savePaymentMethod = () => {
-  // Aquí puedes implementar la lógica para guardar el método de pago
-  console.log("Método de pago guardado");
-  isAddDialogOpen.value = false; // Cierra el modal después de guardar
+// Función para guardar el nuevo método de pago
+const savePaymentMethod = async () => {
+  if (!newCard.value.numeroTarjeta || !newCard.value.nombreTitular || !newCard.value.mesExpiracion || !newCard.value.anoExpiracion || !newCard.value.cvv) {
+    errorMessage.value = 'Por favor, completa todos los campos antes de guardar.';
+    return;
+  }
+  errorMessage.value = '';
+  const tarjetaRequest = {
+    numeroTarjeta: newCard.value.numeroTarjeta,
+    nombreTitular: newCard.value.nombreTitular,
+    fechaExpiracion: `${newCard.value.mesExpiracion}/${newCard.value.anoExpiracion}`,
+    tipoTarjeta: newCard.value.tipoTarjeta
+  };
+
+  try {
+    await guardarTarjeta(tarjetaRequest);
+    await loadUserCards(); // Recargar tarjetas después de guardar
+    isAddDialogOpen.value = false; // Cerrar el modal
+    resetNewCardForm(); // Resetear el formulario de la tarjeta
+  } catch (error) {
+    console.error("Error al guardar tarjeta:", error);
+  }
+};
+
+// Función para resetear el formulario de la tarjeta
+const resetNewCardForm = () => {
+  newCard.value = {
+    numeroTarjeta: "",
+    nombreTitular: "",
+    mesExpiracion: null,
+    anoExpiracion: null,
+    tipoTarjeta: "CREDITO",
+    cvv: ""
+  };
 };
 </script>
 
 <style scoped>
-.headline {
-  color: #fab400;
-}
+.headline { color: #fab400; }
 .main-card {
-  max-height: 609px; /* Limita la altura máxima del card grande */
-  max-width: 1200px; /* Limita el ancho máximo del card grande */
-  overflow-y: auto; /* Habilita scroll si las tarjetas de direcciones exceden la altura */
-  margin: 0 auto; /* Centra el card contenedor */
+  max-height: 609px;
+  max-width: 1200px;
+  overflow-y: auto;
+  margin: 0 auto;
   padding: 20px;
   border: 2px solid #12223d;
-  margin-right: 20px; /* Espacio entre tarjetas */
+  margin-right: 20px;
 }
-
-.scroll-container {
-  overflow: visible; /* Para que las tarjetas dentro no se recorten */
-}
-
-.v-row {
-  margin: 0; /* Elimina márgenes de fila */
-}
-
-.title {
-  font-size: 60px;
-  color: #fab400;
-  margin-bottom: 20px;
-  margin-left: 70px;
-  margin-top: -2px;
-}
-
-.btn {
-  margin-top: 50px;
-  margin-left: 1020px;
-}
-
-.headline{
-    color: #fab400;
-  }
+.title { font-size: 60px; color: #fab400; margin-bottom: 20px; margin-left: 70px; }
+.btn { margin-top: 50px; margin-left: 1020px; }
 </style>

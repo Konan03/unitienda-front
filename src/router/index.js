@@ -23,6 +23,8 @@ import Stationery from '@/pages/categoryPages/StationeryPage.vue'
 import Clothes from '@/pages/categoryPages/ClothesPage.vue'
 import ConfirmPay from '@/pages/payPage/ConfirmPayPage.vue';
 import AdminDetails from '@/pages/adminPages/AdminDetailsPage.vue';
+import CompleteProfile from '@/pages/userPages/CompleteProfile.vue';
+
 
 const routesPages = [
   {path: '/', component: Home, name: 'Home'},
@@ -39,7 +41,8 @@ const routesPages = [
   {path: '/stationery', component: Stationery, name: 'Stationery'},
   {path: '/clothes', component: Clothes, name: 'Clothes'},
   {path: '/messagePay', component: ConfirmPay, name: 'ConfirmPayPage'},
-  {path: '/adminManagement', component: AdminDetails, name: 'AdminDetails' }
+  {path: '/adminManagement', component: AdminDetails, name: 'AdminDetails' },
+  {path:  '/complete-profile ', component: CompleteProfile, name: 'CompleteProfile'}
 ]
 
 const router = createRouter({

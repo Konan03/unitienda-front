@@ -1,14 +1,9 @@
 <template>
-  <v-container
-    class="d-flex flex-column align-center justify-center"
-    
-  >
+  <v-container class="d-flex flex-column align-center justify-center">
     <v-card class="pa-4" max-width="400" flat>
-      <!-- Encabezado de Registro -->
       <h1 class="welcome-title text-center">Crear una cuenta</h1>
 
-      <v-form>
-        <!-- Nombre y Apellido -->
+      <v-form ref="registerForm" v-model="valid">
         <v-row>
           <v-col>
             <v-text-field
@@ -16,6 +11,7 @@
               v-model="nombre"
               outlined
               dense
+              :rules="[v => !!v || 'El nombre es requerido']"
             ></v-text-field>
           </v-col>
           <v-col>
@@ -24,38 +20,39 @@
               v-model="apellido"
               outlined
               dense
+              :rules="[v => !!v || 'El apellido es requerido']"
             ></v-text-field>
           </v-col>
         </v-row>
 
-        <!-- Email -->
         <v-text-field
           label="Email"
           v-model="email"
           type="email"
           outlined
           dense
+          :rules="[v => !!v || 'El email es requerido', v => /.+@.+\..+/.test(v) || 'Email no válido']"
         ></v-text-field>
 
-        <!-- Número Telefónico -->
         <v-text-field
           label="Número telefónico"
           v-model="telefono"
           type="tel"
           outlined
           dense
+          :rules="[v => !!v || 'El teléfono es requerido']"
         ></v-text-field>
 
-        <!-- Tipo y Número de Documento -->
         <v-row>
           <v-col cols="4">
             <v-select
-              label="Tipo"
+              label="Tipo de Documento"
               v-model="tipoDocumento"
               :items="['CC', 'TI', 'CE']"
               outlined
               dense
-            ></v-select>
+              :rules="[v => !!v || 'Tipo de documento es requerido']"
+            />
           </v-col>
           <v-col cols="8">
             <v-text-field
@@ -63,68 +60,65 @@
               v-model="numeroDocumento"
               outlined
               dense
+              :rules="[v => !!v || 'Número de documento es requerido']"
             ></v-text-field>
           </v-col>
         </v-row>
 
-        <!-- Contraseña -->
         <v-text-field
           label="Contraseña"
           v-model="password"
-          type="password"
+          :type="showPassword ? 'text' : 'password'"
           outlined
           dense
-          hint="La contraseña debe tener como mínimo 6 caracteres"
-          persistent-hint
+          :append-inner-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
+          @click:append-inner="togglePasswordVisibility"
+          :rules="[v => !!v || 'La contraseña es requerida', v => v.length >= 6 || 'Mínimo 6 caracteres']"
         ></v-text-field>
 
-        <!-- Confirmar Contraseña -->
         <v-text-field
           label="Confirmar contraseña"
           v-model="confirmPassword"
           type="password"
           outlined
           dense
+          :rules="[v => v === password || 'Las contraseñas no coinciden']"
         ></v-text-field>
 
-        <!-- Botón de Registrarse -->
         <v-btn color="primary" class="register-button" @click="register">
           Registrarse
         </v-btn>
+
+        <v-alert v-if="errorMessage" type="error" dense>{{ errorMessage }}</v-alert>
       </v-form>
 
-      <!-- Enlace para iniciar sesión -->
       <p class="text-center mt-4">
         ¿Ya tienes una cuenta?
         <a href="#" class="link" @click.prevent="goToLogin">Inicia Sesión</a>
       </p>
 
-      <!-- Línea divisoria con texto "O" -->
       <div class="divider-container">
         <div class="divider"></div>
         <div class="divider-text">O</div>
         <div class="divider"></div>
       </div>
 
-      <!-- Botón de Continuar con Google -->
-      <v-btn outlined class="google-button" @click="registerWithGoogle">
-        <img
-          src="@/assets/img/logoGoogle.png"
-          alt="Google G logo"
-          class="google-logo"
-        />
-        Continuar con Google
-      </v-btn>
+      <!-- Botón de Google Sign-In -->
+      <div id="googleSignInBtn"></div>
     </v-card>
   </v-container>
 </template>
 
 <script setup>
-import { ref } from "vue";
-import { useRouter } from 'vue-router'; 
+import { ref, onMounted } from "vue";
+import { useRouter } from 'vue-router';
+import { registerUser } from '.../../../../../service/userService.js';
 
-const router = useRouter()
+const router = useRouter();
+const valid = ref(true);
+const errorMessage = ref("");
 
+// Campos de entrada
 const nombre = ref("");
 const apellido = ref("");
 const email = ref("");
@@ -134,107 +128,139 @@ const numeroDocumento = ref("");
 const password = ref("");
 const confirmPassword = ref("");
 
-function register() {
-  // Lógica para el registro
-  console.log("Registrando usuario con:", {
-    nombre: nombre.value,
-    apellido: apellido.value,
-    email: email.value,
-    telefono: telefono.value,
-    tipoDocumento: tipoDocumento.value,
-    numeroDocumento: numeroDocumento.value,
-    password: password.value,
+// Google Client ID
+const googleClientId = "936811548223-quhuv450ebf50s525g6h7vkskjjug23j.apps.googleusercontent.com";
+
+// Control de visibilidad de contraseña
+const showPassword = ref(false);
+
+function togglePasswordVisibility() {
+  showPassword.value = !showPassword.value;
+}
+
+// Inicializa el botón de Google en modo redirección
+onMounted(() => {
+  console.log("Inicializando Google Sign-In");
+  
+  google.accounts.id.initialize({
+    client_id: googleClientId,
+    callback: handleCredentialResponse,
+    ux_mode: "popup",
+    redirect_uri:"http://localhost:3000/details"
+ 
   });
+
+  google.accounts.id.renderButton(
+    document.getElementById("googleSignInBtn"),
+    { theme: "outline", size: "large" }
+  );
+});
+
+// Función para manejar la respuesta del token de Google
+function handleCredentialResponse(response) {
+  const idToken = response.credential;
+  console.log("ID Token recibido en frontend:", idToken);
+
+  // Intento de autenticación con Google
+  registerWithGoogle(idToken);
+}
+
+// Función para enviar el token al backend y guardar el token JWT
+async function registerWithGoogle(idToken) {
+  try {
+    const res = await fetch('http://localhost:8080/auth/google/success', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ idToken }),
+    });
+
+    const data = await res.json();
+    if (res.ok) {
+      localStorage.setItem('token', data.token);
+      
+      if (data.perfilCompleto) {
+        setTimeout(() => {
+        window.location.href = "http://localhost:3000/details";
+      }, 2000);
+      } else {
+        router.push({ name: 'CompleteProfile' });
+      }
+    } else {
+      console.error("Error en la autenticación:", data);
+      alert("Error en la autenticación con Google. Verifica la consola para más detalles.");
+    }
+  } catch (error) {
+    console.error("Error en la comunicación con el servidor:", error);
+    alert("Hubo un problema al comunicarse con el servidor. Verifica la consola.");
+  }
 }
 
 function goToLogin() {
-  // Lógica para redirigir a la página de inicio de sesión
-  console.log("Redirigiendo a la página de inicio de sesión...");
-  router.push({name: 'Login'})
-}
-
-function registerWithGoogle() {
-  // Lógica para registro con Google
-  console.log("Registrándose con Google...");
+  router.push({ name: 'Login' });
 }
 </script>
 
 <style scoped>
-/* Estilos para el encabezado de registro */
+/* Estilos personalizados */
 .welcome-title {
   font-size: 2.5rem;
   font-weight: bold;
-  color: #0f1f39; /* Color del título */
+  color: #0f1f39;
   margin-bottom: 0.5rem;
 }
-
-/* Estilos personalizados para el formulario */
-.v-text-field__input,
-.v-select__input {
-  background-color: #f1f1f1 !important; /* Color de fondo de los inputs */
+.v-text-field__input, .v-select__input {
+  background-color: #f1f1f1 !important;
 }
-
 .v-card {
   box-shadow: none;
-  width: 100%; /* Asegura que la tarjeta ocupe todo el ancho disponible */
+  width: 100%;
 }
-
-.v-text-field,
-.v-select {
-  margin-bottom: 10px; /* Reduce el espacio entre los inputs */
+.v-text-field, .v-select {
+  margin-bottom: 10px;
 }
-
 .register-button {
-  background-color: #0f1f39 !important; /* Color del botón */
-  color: white !important; /* Color del texto del botón */
-  font-size: 1rem; /* Tamaño de fuente */
-  padding: 10px 24px; /* Ajuste del padding */
-  border-radius: 10px; /* Bordes más redondeados */
-  width: auto; /* El botón se ajusta a su contenido */
+  background-color: #0f1f39 !important;
+  color: white !important;
+  font-size: 1rem;
+  padding: 10px 24px;
+  border-radius: 10px;
+  width: auto;
   display: flex;
   justify-content: center;
   align-items: center;
-  margin: 0 auto; /* Centra el botón horizontalmente */
+  margin: 0 auto;
 }
-
-/* Línea divisoria */
 .divider-container {
   display: flex;
   align-items: center;
   margin: 20px 0;
 }
-
 .divider {
   flex-grow: 1;
   height: 1px;
   background-color: #8e8e8e;
 }
-
 .divider-text {
   padding: 0 10px;
   color: #8e8e8e;
 }
-
-/* Botón de Google */
 .google-button {
   display: flex;
   justify-content: center;
   align-items: center;
   color: #0f1f39 !important;
-  font-size: 0.875rem; /* Tamaño más pequeño */
+  font-size: 0.875rem;
   border-radius: 10px;
   width: 100%;
-  max-width: 250px; /* Ajusta el ancho máximo del botón */
-  padding: 8px 16px; /* Ajuste del padding para hacerlo más pequeño */
-  margin: 0 auto; /* Centra el botón horizontalmente */
+  max-width: 250px;
+  padding: 8px 16px;
+  margin: 0 auto;
 }
-
 .google-logo {
-  width: 20px; /* Ajusta el tamaño de la G de Google */
+  width: 20px;
   height: 20px;
   margin-right: 10px;
 }
-
 .link {
   color: #0F1F39;
   text-decoration: underline;

@@ -1,130 +1,183 @@
 <template>
-  <v-container
-    class="d-flex flex-column align-center justify-center"
-    
-  >
+  <v-container class="d-flex flex-column align-center justify-center">
     <v-card class="pa-4" max-width="400" flat>
-      <!-- Encabezado de Bienvenida -->
       <h1 class="welcome-title text-center">Bienvenido</h1>
       <p class="subtitle text-center">
         Inicia sesión o
-        <a href="#" class="link" @click.prevent="goToCreateAccount"
-          >crea una cuenta</a
-        >
+        <a href="#" class="link" @click.prevent="goToCreateAccount">crea una cuenta</a>
       </p>
 
       <v-form>
-        <!-- Campo de Email -->
         <v-text-field
           label="Email"
           v-model="email"
           type="email"
           outlined
           dense
+          :error-messages="emailError"
         ></v-text-field>
 
-        <!-- Campo de Contraseña -->
         <v-text-field
           label="Contraseña"
           v-model="password"
           type="password"
           outlined
           dense
+          :error-messages="passwordError"
         ></v-text-field>
 
-        <!-- Enlace para olvidar la contraseña -->
         <div class="text-right forgot-password-container">
-          <a
-            href="#"
-            class="forgot-password"
-            @click.prevent="goToForgotPassword"
-            >¿Olvidaste tu contraseña?</a
-          >
+          <a href="#" class="forgot-password" @click.prevent="goToForgotPassword">¿Olvidaste tu contraseña?</a>
         </div>
 
-        <!-- Botón de Iniciar sesión -->
         <v-btn color="primary" class="login-button" @click="login">
           Iniciar sesión
         </v-btn>
+        
+        <!-- Mensaje de error general -->
+        <div v-if="generalError" class="error-message">{{ generalError }}</div>
       </v-form>
 
-      <!-- Línea divisoria con texto "O" -->
       <div class="divider-container">
         <div class="divider"></div>
         <div class="divider-text">O</div>
         <div class="divider"></div>
       </div>
 
-      <!-- Botón de Iniciar sesión con Google -->
-      <v-btn outlined class="google-button" @click="loginWithGoogle">
-        <img
-          src="@/assets/img/logoGoogle.png"
-          alt="Google G logo"
-          class="google-logo"
-        />
-        Continuar con Google
-      </v-btn>
+      <div id="googleSignInBtn"></div>
     </v-card>
   </v-container>
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 import { useRouter } from 'vue-router'; 
+import { loginUser, getCurrentUser } from '.../../../../../service/userService.js';
 
+const emits = defineEmits(['login-success']);
 const email = ref("");
 const password = ref("");
-const router = useRouter()
+const router = useRouter();
+const emailError = ref("");
+const passwordError = ref("");
+const generalError = ref("");
 
-const emailAdmin = "admin@admin.com"
-const emailUser = "user@user.com"
+// Google Client ID
+const googleClientId = "936811548223-quhuv450ebf50s525g6h7vkskjjug23j.apps.googleusercontent.com";
 
-function goToCreateAccount() {
-  // Lógica para redirigir a la página de creación de cuenta
-  console.log("Redirigiendo a crear cuenta...");
-  router.push({name: 'Register'})
-}
+onMounted(() => {
+  google.accounts.id.initialize({
+    client_id: googleClientId,
+    callback: handleCredentialResponse,
+    ux_mode: "popup",
+    redirect_uri: "http://localhost:3000/details"
+  });
 
-function goToForgotPassword() {
-  // Lógica para redirigir a la página de recuperación de contraseña
-  console.log("Redirigiendo a recuperación de contraseña...");
-  router.push({name: 'ChangePassword'})
-}
+  google.accounts.id.renderButton(
+    document.getElementById("googleSignInBtn"),
+    { theme: "outline", size: "large" }
+  );
+});
 
-function login() {
-  // Lógica para iniciar sesión
-  if(email.value == emailAdmin){
-    console.log("Iniciando sesión con", email.value, password.value);
-    router.push({name: 'AdminDetails'})
+async function login() {
+  emailError.value = "";
+  passwordError.value = "";
+  generalError.value = "";
+
+  if (!email.value) {
+    emailError.value = "Por favor, ingrese su correo electrónico.";
   }
-
-  if(email.value == emailUser){
-    console.log("Iniciando sesión con", email.value, password.value);
-    router.push({name: 'UserDetails'})
+  if (!password.value) {
+    passwordError.value = "Por favor, ingrese su contraseña.";
   }
   
+  if (emailError.value || passwordError.value) {
+    return;
+  }
+
+  try {
+    const token = await loginUser({ email: email.value, password: password.value });
+    if (token) {
+      localStorage.setItem("token", token);
+
+      // Lógica para verificar si el usuario es admin
+      const userInfo = await getCurrentUser(); // Este método debe obtener la información del usuario
+      const isAdmin = userInfo.tipoUsuario === "Admin";
+
+      if (isAdmin) {
+        setTimeout(() => {
+          window.location.href = "/adminManagement"; // Redirigir a adminManagement si es admin
+        }, 1000); // Esperar un segundo antes de redirigir
+      } else {
+        setTimeout(() => {
+          window.location.href = "/details"; // Redirigir a detalles si no es admin
+        }, 1000);
+      }
+    } else {
+      generalError.value = "Error: Token no recibido";
+    }
+  } catch (error) {
+    console.error("Error en el inicio de sesión:", error);
+    generalError.value = "Credenciales incorrectas. Por favor, verifique sus datos.";
+  }
 }
 
-function loginWithGoogle() {
-  // Lógica para iniciar sesión con Google
-  console.log("Iniciando sesión con Google...");
+function handleCredentialResponse(response) {
+  const idToken = response.credential;
+  console.log("ID Token recibido en frontend:", idToken);
+
+  registerWithGoogle(idToken);
 }
+
+async function registerWithGoogle(idToken) {
+  try {
+    const res = await fetch('http://localhost:8080/auth/google/success', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ idToken }),
+    });
+
+    const data = await res.json();
+    if (res.ok) {
+      localStorage.setItem('token', data.token);
+
+      // Redirigir a la página de detalles después de 2 segundos
+      setTimeout(() => {
+        window.location.href = "http://localhost:3000/details";
+      }, 2000);
+    } else {
+      console.error("Error en la autenticación:", data);
+      alert("Error en la autenticación con Google. Verifica la consola para más detalles.");
+    }
+  } catch (error) {
+    console.error("Error en la comunicación con el servidor:", error);
+    alert("Hubo un problema al comunicarse con el servidor. Verifica la consola.");
+  }
+}
+
+const goToCreateAccount = () => {
+  router.push({ name: 'Register' });
+};
+
+const goToForgotPassword = () => {
+  router.push({ name: 'ChangePassword' });
+};
 </script>
 
+
 <style scoped>
-/* Estilos para el encabezado de bienvenida */
 .welcome-title {
   font-size: 2.5rem;
   font-weight: bold;
-  color: #2c3e50; /* Color del título */
+  color: #2c3e50;
   margin-bottom: 0.5rem;
 }
 
 .subtitle {
   font-size: 1rem;
-  color: #7d7d7d; /* Color del texto del subtítulo */
-  margin-top: -10px; /* Ajuste para acercar el subtítulo al título */
-  margin-bottom: 1.5rem; /* Espacio debajo del subtítulo */
+  color: #7d7d7d;
+  margin-top: -10px;
+  margin-bottom: 1.5rem;
 }
 
 .link {
@@ -137,23 +190,22 @@ function loginWithGoogle() {
   text-decoration: none;
 }
 
-/* Estilos personalizados para el formulario */
 .v-text-field__input {
-  background-color: #f1f1f1 !important; /* Color de fondo de los inputs */
+  background-color: #f1f1f1 !important;
 }
 
 .v-card {
   box-shadow: none;
-  width: 100%; /* Asegura que la tarjeta ocupe todo el ancho disponible */
+  width: 100%;
 }
 
 .v-text-field {
-  margin-bottom: 10px; /* Reduce el espacio entre los inputs */
+  margin-bottom: 10px;
 }
 
 .forgot-password-container {
-  margin-top: -10px; /* Pega el texto al campo de contraseña */
-  margin-bottom: 20px; /* Añade un espacio antes del botón */
+  margin-top: -10px;
+  margin-bottom: 20px;
 }
 
 .forgot-password {
@@ -167,19 +219,24 @@ function loginWithGoogle() {
 }
 
 .login-button {
-  background-color: #0f1f39 !important; /* Color del botón */
-  color: white !important; /* Color del texto del botón */
-  font-size: 1rem; /* Tamaño de fuente */
-  padding: 10px 24px; /* Ajuste del padding */
-  border-radius: 10px; /* Bordes más redondeados */
-  width: auto; /* El botón se ajusta a su contenido */
+  background-color: #0f1f39 !important;
+  color: white !important;
+  font-size: 1rem;
+  padding: 10px 24px;
+  border-radius: 10px;
+  width: auto;
   display: flex;
   justify-content: center;
   align-items: center;
-  margin: 0 auto; /* Centra el botón horizontalmente */
+  margin: 0 auto;
 }
 
-/* Línea divisoria */
+.error-message {
+  color: red;
+  margin-top: 15px;
+  text-align: center;
+}
+
 .divider-container {
   display: flex;
   align-items: center;
@@ -197,28 +254,22 @@ function loginWithGoogle() {
   color: #8E8E8E;
 }
 
-/* Botón de Google */
 .google-button {
   display: flex;
   justify-content: center;
   align-items: center;
   color: #0f1f39 !important;
-  font-size: 0.875rem; /* Tamaño más pequeño */
+  font-size: 0.875rem;
   border-radius: 10px;
   width: 100%;
-  max-width: 250px; /* Ajusta el ancho máximo del botón */
-  padding: 8px 16px; /* Ajuste del padding para hacerlo más pequeño */
-  margin: 0 auto; /* Centra el botón horizontalmente */
+  max-width: 250px;
+  padding: 8px 16px;
+  margin: 0 auto;
 }
 
 .google-logo {
-  width: 20px;  /* Ajusta el tamaño de la G de Google */
+  width: 20px;
   height: 20px;
-  margin-right: 10px;
-}
-
-.google-icon {
-  font-size: 18px; /* Ajusta el tamaño del icono de Google */
   margin-right: 10px;
 }
 </style>
